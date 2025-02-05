@@ -41,7 +41,6 @@ class _OnboardingScreenState extends State<OnBoardingScreen> {
             _currentPage = index;
           });
         },
-        reverse: true,
         children: [
           _buildPage(
             containerColor:Colors.transparent,
@@ -70,10 +69,10 @@ class _OnboardingScreenState extends State<OnBoardingScreen> {
             name: "assets/images/onboarding3.png",
             title: "Explore All Genres",
             description: "Discover movies from every genre, in all available qualities. Find something new and exciting to watch every day.",
-            button1Text: "Back",
-            button1Action: _previousPage,
-            button2Text: "Next",
-            button2Action: _nextPage,
+            button1Text: "Next",
+            button1Action: _nextPage,
+            button2Text: "Back",
+            button2Action: _previousPage,
           ),
           _buildPage(
             containerColor: Color(0xff121312),
@@ -81,10 +80,10 @@ class _OnboardingScreenState extends State<OnBoardingScreen> {
             name: "assets/images/onboarding4.png",
             title: "Create Watchlists",
             description: "Save movies to your watchlist to keep track of what you want to watch next. Enjoy films in various qualities and genres.",
-            button1Text: "Back",
-            button1Action: _previousPage,
-            button2Text: "Next",
-            button2Action: _nextPage,
+            button1Text: "Next",
+            button1Action: _nextPage,
+            button2Text: "Back",
+            button2Action: _previousPage,
           ),
           _buildPage(
             containerColor: Color(0xff121312),
@@ -92,10 +91,10 @@ class _OnboardingScreenState extends State<OnBoardingScreen> {
             name: "assets/images/onboarding5.png",
             title: "Rate, Review, and Learn",
             description: "Share your thoughts on the movies you've watched. Dive deep into film details and help others discover great movies with your reviews.",
-            button1Text: "Back",
-            button1Action: _previousPage,
-            button2Text: "Next",
-            button2Action: _nextPage,
+            button1Text: "Next",
+            button1Action: _nextPage,
+            button2Text: "Back",
+            button2Action: _previousPage,
           ),
           _buildPage(
             containerColor: Color(0xff121312),
@@ -103,10 +102,10 @@ class _OnboardingScreenState extends State<OnBoardingScreen> {
             name: "assets/images/onboarding6.png",
             title: "Start Watching Now",
             description: "",
-            button1Text: "Back",
-            button1Action: _previousPage,
-            button2Text: "Finish",
-            button2Action: () => _goToLogin(context),
+            button2Text: "Back",
+            button2Action: _previousPage,
+            button1Text: "Finish",
+            button1Action: () => _goToLogin(context),
           ),
         ],
       ),
@@ -159,7 +158,7 @@ class _OnboardingScreenState extends State<OnBoardingScreen> {
                           backgroundColor: Theme.of(context).primaryColor,
                         ),
                         onPressed: button1Action,
-                        child: Text(button1Text),
+                        child: Text(button1Text,style: Theme.of(context).textTheme.titleMedium!.copyWith(color: Color(0xff121312)),),
                       ),
                     ),
                   ],
@@ -169,8 +168,17 @@ class _OnboardingScreenState extends State<OnBoardingScreen> {
                     children: [
                       Expanded(
                         child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            side: BorderSide(color: Theme.of(context).primaryColor),
+                            padding: EdgeInsets.symmetric(vertical: 8),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                            backgroundColor: Colors.transparent,
+                          ),
                           onPressed: button2Action,
-                          child: Text(button2Text),
+                          child: Text(button2Text,style: Theme.of(context).textTheme.titleSmall!
+                              .copyWith(color: Theme.of(context).primaryColor, ),),
                         ),
                       ),
                     ],

@@ -1,4 +1,16 @@
 {
-
+  "email": "Email",
+  "password": "Password",
+  "forget_password": "Forget Password?",
+  "login": "Login",
+  "don't_account": "Don’t Have Account ?",
+  "create_account": " Create Account",
+  "or": "Or",
+  "login_with_google": "Login With Google",
+  "name":"Name",
+  "register":"Register",
+  "re_password":"Re Password",
+  "have_account":"Already Have Account ? ",
+  "phone_number": "Phone Number"
 }
 

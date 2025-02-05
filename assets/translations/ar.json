@@ -1,2 +1,16 @@
 {
+  "email": "البريد الإلكتروني",
+  "password": "كلمة المرور",
+  "forget_password": "هل نسيت كلمة المرور؟",
+  "login": "تسجيل الدخول",
+  "don't_account": "لا تملك حساباً؟",
+  "create_account": "إنشاء حساب",
+  "or": "أو",
+  "login_with_google": "تسجيل الدخول باستخدام جوجل",
+  "name": "الاسم",
+  "register": "تسجيل",
+  "re_password": "إعادة كلمة المرور",
+  "have_account": "هل لديك حساب بالفعل؟ ",
+  "phone_number": "رقم الهاتف"
+
 }
