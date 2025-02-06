@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:toggle_switch/toggle_switch.dart';
 
+import 'forget_password.dart';
 import 'home_screen.dart';
 import 'register_screen.dart';
 
@@ -94,12 +95,17 @@ class LoginScreen extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  Text(
-                    'forget_password'.tr(),
-                    style: Theme.of(context)
-                        .textTheme
-                        .titleSmall!
-                        .copyWith(color: Theme.of(context).primaryColor,fontSize: 14),
+                  GestureDetector(
+                    onTap: (){
+                      Navigator.pushNamed(context, ForgetPassword.routeName);
+                    },
+                    child: Text(
+                      'forget_password'.tr(),
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleSmall!
+                          .copyWith(color: Theme.of(context).primaryColor,fontSize: 14),
+                    ),
                   ),
                 ],
               ),

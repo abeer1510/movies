@@ -98,10 +98,9 @@ class _OnboardingScreenState extends State<OnBoardingScreen> {
           ),
           _buildPage(
             containerColor: Color(0xff121312),
-            containereHeight: 220,
+            containereHeight: 200,
             name: "assets/images/onboarding6.png",
             title: "Start Watching Now",
-            description: "",
             button2Text: "Back",
             button2Action: _previousPage,
             button1Text: "Finish",
@@ -117,7 +116,7 @@ class _OnboardingScreenState extends State<OnBoardingScreen> {
     required double containereHeight,
     required String name,
     required String title,
-    required String description,
+    String? description,
     required String button1Text,
     required VoidCallback button1Action,
     String? button2Text,
@@ -139,7 +138,8 @@ class _OnboardingScreenState extends State<OnBoardingScreen> {
           children: [
             Text(title, style: Theme.of(context).textTheme.titleLarge,textAlign: TextAlign.center),
             SizedBox(height: 16),
-            Text(description, style: Theme.of(context).textTheme.titleMedium, textAlign: TextAlign.center),
+            if (description != null)
+              Text(description, style: Theme.of(context).textTheme.titleMedium, textAlign: TextAlign.center),
             SizedBox(height: 30),
             Column(
               mainAxisAlignment: button2Text == null

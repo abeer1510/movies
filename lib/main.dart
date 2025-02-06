@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:news/screens/forget_password.dart';
 import 'package:news/screens/login_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/onbording_screen.dart';
@@ -42,6 +43,7 @@ class MyApp extends StatelessWidget {
         OnBoardingScreen.routeName:(context)=>OnBoardingScreen(),
         LoginScreen.routeName:(context)=>LoginScreen(),
         RegisterScreen.routeName:(context)=>RegisterScreen(),
+        ForgetPassword.routeName:(context)=>ForgetPassword(),
         HomeScreen.routeName:(context)=>HomeScreen(),
 
 
