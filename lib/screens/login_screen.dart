@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_icon_class/font_awesome_icon_class.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:news/firebase/firebase_manager.dart';
 import 'package:toggle_switch/toggle_switch.dart';
 
 import 'forget_password.dart';
@@ -193,7 +194,7 @@ class LoginScreen extends StatelessWidget {
               ),
               ElevatedButton(
                   onPressed: () {
-                    //Navigator.pushNamed(context, OnBoardingScreen.routeName);
+                    FirebaseManager.signInWithGoogle;
                   },
                   style: ElevatedButton.styleFrom(
                     padding: EdgeInsets.symmetric(vertical: 14),
