@@ -1,7 +1,10 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:news/screens/forget_password.dart';
 import 'package:news/screens/login_screen.dart';
+import 'screens/home_screen.dart';
 import 'screens/onbording_screen.dart';
+import 'screens/register_screen.dart';
 import 'screens/splash_screen.dart';
 import 'theme/dark_theme.dart';
 import 'theme/theme.dart';
@@ -25,12 +28,12 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     BaseTheme darkTheme =DarkTheme();
     return MaterialApp(
-
       darkTheme: darkTheme.themeData,
       themeMode: ThemeMode.dark,
       localizationsDelegates: context.localizationDelegates,
       supportedLocales: context.supportedLocales,
       locale: context.locale,
+
 
 
       debugShowCheckedModeBanner: false,
@@ -39,6 +42,11 @@ class MyApp extends StatelessWidget {
         SplashScreen.routeName:(context)=>SplashScreen(),
         OnBoardingScreen.routeName:(context)=>OnBoardingScreen(),
         LoginScreen.routeName:(context)=>LoginScreen(),
+        RegisterScreen.routeName:(context)=>RegisterScreen(),
+        ForgetPassword.routeName:(context)=>ForgetPassword(),
+        HomeScreen.routeName:(context)=>HomeScreen(),
+
+
       },
     );
   }
