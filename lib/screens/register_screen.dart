@@ -285,7 +285,7 @@ class RegisterScreen extends StatelessWidget {
                                     () async {
                                   await userProvider.initUser();
                                   Navigator.pop(context);
-                                  Navigator.pushNamedAndRemoveUntil(context, HomeScreen.routeName, (route) => false,);
+                                  Navigator.pushNamedAndRemoveUntil(context, LoginScreen.routeName, (route) => false,);
                                 },(){
                               showDialog(context: context,
                                 builder: (context) => const AlertDialog(
