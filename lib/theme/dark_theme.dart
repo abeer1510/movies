@@ -25,8 +25,6 @@ class DarkTheme extends BaseTheme{
       ),
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
         backgroundColor: Color(0xff282A28),
-        showSelectedLabels: true,
-        showUnselectedLabels: true,
         selectedItemColor: primaryColor,
         unselectedItemColor: Colors.white,
         type: BottomNavigationBarType.fixed,
