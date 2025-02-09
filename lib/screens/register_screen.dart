@@ -1,3 +1,4 @@
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_icon_class/font_awesome_icon_class.dart';
@@ -16,7 +17,17 @@ class RegisterScreen extends StatelessWidget {
   var rePasswordController = TextEditingController();
   var phoneNumberController = TextEditingController();
 
-
+  final List<String> imgList = [
+    'assets/images/gamer1.png',
+    'assets/images/gamer2.png',
+    'assets/images/gamer3.png',
+    'assets/images/gamer4.png',
+    'assets/images/gamer5.png',
+    'assets/images/gamer6.png',
+    'assets/images/gamer7.png',
+    'assets/images/gamer8.png',
+    'assets/images/gamer9.png',
+  ];
 
 
   @override
@@ -36,9 +47,27 @@ class RegisterScreen extends StatelessWidget {
           child: Column(
             children: [
               Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+                //mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Image(image: AssetImage('assets/images/filter.png')),
+                  //Image(image: AssetImage('assets/images/filter.png')),
+                  Expanded(
+                    child: CarouselSlider(
+                      options: CarouselOptions(
+                        height: 110.0,
+                        viewportFraction: 0.33,
+                        enableInfiniteScroll: false,
+                        enlargeCenterPage: true,
+                        aspectRatio: 4 / 3,
+                        onPageChanged: (index, reason) {
+                          // Handle page change if needed
+                        },
+                      ),
+                      items: imgList.map((item) =>
+                          Container(
+                            child: Image.asset(item, fit: BoxFit.cover, ),
+                          )).toList(),
+                    ),
+                  ),
                 ],
               ),
               Padding(
