@@ -1,7 +1,9 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:news/screens/forget_password.dart';
 import 'package:news/screens/login_screen.dart';
+import 'firebase/firebase_options.dart';
 import 'screens/home_screen.dart';
 import 'screens/onbording_screen.dart';
 import 'screens/register_screen.dart';
@@ -12,6 +14,9 @@ import 'theme/theme.dart';
 void main()async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(  EasyLocalization(
         supportedLocales: [Locale('en'), Locale('ar')],
         path: 'assets/translations',
