@@ -12,11 +12,21 @@ import 'forget_password.dart';
 import 'home_screen.dart';
 import 'register_screen.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
   static const String routeName = 'LoginScreen';
   LoginScreen({super.key});
+
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
   var emailController = TextEditingController();
+
   var passwordController = TextEditingController();
+
+  bool _obscureText = true; // This controls whether the password is visible
+
   var formKey = GlobalKey<FormState>();
 
   @override
@@ -65,7 +75,7 @@ class LoginScreen extends StatelessWidget {
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
-            
+
                     ),
                   ),
                 ),
@@ -82,7 +92,7 @@ class LoginScreen extends StatelessWidget {
                       formKey.currentState!.validate();
                     },
                     controller: passwordController,
-                    obscureText: true,
+                    obscureText: _obscureText,
                     style: Theme.of(context)
                         .textTheme
                         .titleSmall!,
@@ -94,22 +104,31 @@ class LoginScreen extends StatelessWidget {
                         Icons.lock,
                         color: Colors.white,
                       ),
-                      suffixIcon: Icon(
-                        Icons.visibility_off,
-                        color: Colors.white,
+                      suffixIcon: InkWell(
+                        onTap: (){
+                          setState(() {
+                            _obscureText = !_obscureText; // Toggle password visibility
+
+                          });
+
+                        },
+                        child: Icon(
+                          _obscureText ? Icons.visibility_off : Icons.visibility,
+                          color: Colors.white,
+                        ),
                       ),
                       labelStyle: Theme.of(context).textTheme.titleSmall,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
-            
+
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
-            
+
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
-            
+
                       ),
                     ),
                   ),
@@ -199,7 +218,7 @@ class LoginScreen extends StatelessWidget {
                 GestureDetector(
                   onTap: (){
                     Navigator.pushNamed(context, RegisterScreen.routeName);
-            
+
                   },
                   child: Text.rich(
                       textAlign: TextAlign.center,
@@ -302,7 +321,7 @@ class LoginScreen extends StatelessWidget {
                     }
                     else{
                       context.setLocale(Locale('en'));
-            
+
                     }
                     print('switched to: $index');
                   },
