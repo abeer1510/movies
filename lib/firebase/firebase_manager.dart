@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
+import '../model/user_model.dart';
+
 
 class FirebaseManager {
 
@@ -49,6 +51,21 @@ class FirebaseManager {
         print('Wrong password provided for that user.');
       }*/
     }
+  }
+
+  static CollectionReference <UserModel> getUsersCollection() {
+    return FirebaseFirestore.instance.collection("Users").withConverter<UserModel>(
+        fromFirestore: (snapshot, _) {
+          return UserModel.fromJson(snapshot.data()!);
+        }, toFirestore: (value, _) {
+      return value.toJson();
+    });
+  }
+
+  static Future<UserModel?> getUser(String id)async{
+    var collection=getUsersCollection();
+    DocumentSnapshot<UserModel> snapshot = await collection.doc(id).get();
+    return snapshot.data();
   }
 
   static Future<UserCredential> signInWithGoogle() async {

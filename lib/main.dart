@@ -1,8 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:news/provider/auth_provider.dart';
 import 'package:news/screens/forget_password.dart';
 import 'package:news/screens/login_screen.dart';
+import 'package:provider/provider.dart';
 import 'firebase/firebase_options.dart';
 import 'screens/home_screen.dart';
 import 'screens/onbording_screen.dart';
@@ -17,11 +20,16 @@ void main()async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(  EasyLocalization(
-        supportedLocales: [Locale('en'), Locale('ar')],
-        path: 'assets/translations',
-        fallbackLocale: Locale('en'),
-        child: MyApp()),
+  await FirebaseFirestore.instance.enableNetwork();
+
+  runApp(  ChangeNotifierProvider(
+    create: (context)=> UserProvider(),
+    child: EasyLocalization(
+          supportedLocales: [Locale('en'), Locale('ar')],
+          path: 'assets/translations',
+          fallbackLocale: Locale('en'),
+          child: MyApp()),
+  ),
   );
 }
 
@@ -31,6 +39,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var userProvider =Provider.of<UserProvider>(context);
     BaseTheme darkTheme =DarkTheme();
     return MaterialApp(
       darkTheme: darkTheme.themeData,
@@ -38,11 +47,10 @@ class MyApp extends StatelessWidget {
       localizationsDelegates: context.localizationDelegates,
       supportedLocales: context.supportedLocales,
       locale: context.locale,
-
-
-
       debugShowCheckedModeBanner: false,
-      initialRoute:SplashScreen.routeName,
+      initialRoute:
+      userProvider.currentUser!=null?
+      HomeScreen.routeName : SplashScreen.routeName,
       routes: {
         SplashScreen.routeName:(context)=>SplashScreen(),
         OnBoardingScreen.routeName:(context)=>OnBoardingScreen(),

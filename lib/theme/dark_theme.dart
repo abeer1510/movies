@@ -45,6 +45,15 @@ class DarkTheme extends BaseTheme{
           fontWeight: FontWeight.w400,
           color: textColor,
         ),
+        headlineMedium: GoogleFonts.roboto(
+          fontSize: 20,fontWeight: FontWeight.w700,color: Colors.white
+        ),
+          headlineLarge: GoogleFonts.roboto(
+              fontSize: 28,fontWeight: FontWeight.w700,color: Colors.white
+          ),
+        headlineSmall: GoogleFonts.roboto(
+            fontSize: 20,fontWeight: FontWeight.w700,color: Colors.white
+        ),
       )
   );
 
