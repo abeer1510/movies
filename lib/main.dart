@@ -50,7 +50,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       initialRoute:
       userProvider.currentUser!=null?
-      HomeScreen.routeName : LoginScreen.routeName,
+      HomeScreen.routeName : SplashScreen.routeName,
       routes: {
         SplashScreen.routeName:(context)=>SplashScreen(),
         OnBoardingScreen.routeName:(context)=>OnBoardingScreen(),

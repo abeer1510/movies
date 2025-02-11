@@ -27,11 +27,11 @@ class RegisterScreen extends StatelessWidget {
     var userProvider = Provider.of<UserProvider>(context);
     return Scaffold(
       appBar: AppBar(
-          title: Text(
+        title: Text(
             'register'.tr(),
             style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                color: Theme.of(context).primaryColor,)
-          ),
+              color: Theme.of(context).primaryColor,)
+        ),
         leading: BackButton(color: Theme.of(context).primaryColor),
       ),
       body: Padding(
@@ -44,7 +44,7 @@ class RegisterScreen extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Image(image: AssetImage('assets/images/filter.png')),
+                    Image(image: AssetImage('assets/images/gamer1.png')),
                   ],
                 ),
                 Padding(
@@ -77,7 +77,7 @@ class RegisterScreen extends StatelessWidget {
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
-            
+
                       ),
                     ),
                   ),
@@ -116,15 +116,15 @@ class RegisterScreen extends StatelessWidget {
                       labelStyle: Theme.of(context).textTheme.titleSmall,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
-            
+
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
-            
+
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
-                        
+
                       ),
                     ),
                   ),
@@ -163,15 +163,15 @@ class RegisterScreen extends StatelessWidget {
                       labelStyle: Theme.of(context).textTheme.titleSmall,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
-            
+
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
-            
+
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
-            
+
                       ),
                     ),
                   ),
@@ -213,15 +213,15 @@ class RegisterScreen extends StatelessWidget {
                       labelStyle: Theme.of(context).textTheme.titleSmall,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
-            
+
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
-            
+
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
-            
+
                       ),
                     ),
                   ),
@@ -253,19 +253,19 @@ class RegisterScreen extends StatelessWidget {
                         Icons.call,
                         color: Colors.white,
                       ),
-            
+
                       labelStyle: Theme.of(context).textTheme.titleSmall,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
-            
+
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
-            
+
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
-            
+
                       ),
                     ),
                   ),

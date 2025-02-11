@@ -12,27 +12,27 @@ class HomeTab extends StatelessWidget {
       body: FutureBuilder<SourcesResponse>
         (future: ApiManager.getPopular(),
           builder: (context,snapshot){
-          if(snapshot.connectionState == ConnectionState.waiting){
-            return Center(child: CircularProgressIndicator());
-          }
-          if(snapshot.hasError){
-            return Center(child: Text("Something Went Wrong",style: Theme.of(context).textTheme.titleLarge,));
-          }
-          var data = snapshot.data?.results??[];
-          return DefaultTabController(
-            length: data.length,
-            child: Column(
-              children: [
-                Expanded(
-                  child: ListView.separated(
-                    scrollDirection: Axis.horizontal,
-                      itemBuilder: (context,index){
-                   return MovieItem(results: snapshot.data!.results![index]);
-                  }, separatorBuilder: (context,index)=>SizedBox(width: 10,), itemCount: snapshot.data?.results?.length??0),
-                ),
-              ],
-            ),
-          );
+            if(snapshot.connectionState == ConnectionState.waiting){
+              return Center(child: CircularProgressIndicator());
+            }
+            if(snapshot.hasError){
+              return Center(child: Text("Something Went Wrong",style: Theme.of(context).textTheme.titleLarge,));
+            }
+            var data = snapshot.data?.results??[];
+            return DefaultTabController(
+              length: data.length,
+              child: Column(
+                children: [
+                  Expanded(
+                    child: ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        itemBuilder: (context,index){
+                          return MovieItem(results: snapshot.data!.results![index]);
+                        }, separatorBuilder: (context,index)=>SizedBox(width: 10,), itemCount: snapshot.data?.results?.length??0),
+                  ),
+                ],
+              ),
+            );
           }),
     );
   }

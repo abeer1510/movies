@@ -6,7 +6,7 @@ import 'package:news/screens/tabs/search_tab.dart';
 
 class HomeScreen extends StatefulWidget {
   static const String routeName = 'HomeScreen';
-   HomeScreen({super.key});
+  HomeScreen({super.key});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -20,7 +20,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16)),
+            borderRadius: BorderRadius.circular(16)),
         child: Padding(
             padding: EdgeInsets.only(bottom: 8,right: 8,left: 8),
             child: ClipRRect(
@@ -54,7 +54,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ],),);
   }
   List<Widget> tabs=[
-   HomeTab(),
+    HomeTab(),
     SearchTab(),
     BrowseTab(),
     ProfileTab()
