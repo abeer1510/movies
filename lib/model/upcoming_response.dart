@@ -1,7 +1,7 @@
 class UpcomingResponse {
   Dates? dates;
   int? page;
-  List<Results>? results;
+  List<Results1>? results;
   int? totalPages;
   int? totalResults;
 
@@ -16,9 +16,9 @@ class UpcomingResponse {
     dates = json['dates'] != null ? new Dates.fromJson(json['dates']) : null;
     page = json['page'];
     if (json['results'] != null) {
-      results = <Results>[];
+      results = <Results1>[];
       json['results'].forEach((v) {
-        results!.add(new Results.fromJson(v));
+        results!.add(new Results1.fromJson(v));
       });
     }
     totalPages = json['total_pages'];
@@ -42,7 +42,7 @@ class Dates {
 
 }
 
-class Results {
+class Results1 {
   bool? adult;
   String? backdropPath;
   List<int>? genreIds;
@@ -58,7 +58,7 @@ class Results {
   double? voteAverage;
   int? voteCount;
 
-  Results(
+  Results1(
       {this.adult,
         this.backdropPath,
         this.genreIds,
@@ -74,7 +74,7 @@ class Results {
         this.voteAverage,
         this.voteCount});
 
-  Results.fromJson(Map<String, dynamic> json) {
+  Results1.fromJson(Map<String, dynamic> json) {
     adult = json['adult'];
     backdropPath = json['backdrop_path'];
     genreIds = json['genre_ids'].cast<int>();
