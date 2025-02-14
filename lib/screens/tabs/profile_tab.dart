@@ -76,8 +76,9 @@ class ProfileTab extends StatelessWidget {
                   SizedBox(width: 10,),
                   ElevatedButton(
                       onPressed: () {
-
-                      },
+                        FirebaseManager.logOut().then((_){
+    Navigator.pushNamedAndRemoveUntil(context, LoginScreen.routeName, (route) => false,);
+                      });},
                       style: ElevatedButton.styleFrom(
                         padding: EdgeInsets.symmetric(vertical: 8),
                         shape: RoundedRectangleBorder(
@@ -140,13 +141,3 @@ class ProfileTab extends StatelessWidget {
     );
   }
 }
-
-/*Center(child:
-InkWell(
-onTap: () {
-FirebaseManager.logOut().then((_){
-Navigator.pushNamedAndRemoveUntil(context, LoginScreen.routeName, (route) => false,);
-});
-},
-
-child: Text("Sign Out",style: TextStyle(color: Colors.white),))),*/
