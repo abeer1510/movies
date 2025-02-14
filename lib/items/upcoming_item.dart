@@ -17,11 +17,13 @@ class UpcomingItem extends StatelessWidget {
             child:
             Stack(
               children: [
+
                 GestureDetector(
                     onTap: (){
                       Navigator.pushNamed(context, DetailsScreen.routeName);
                     },
                     child: Image.network("https://image.tmdb.org/t/p/w500${results.posterPath}"??"",fit: BoxFit.fill,height: 220,width: 150,)),
+
                 Padding(
                   padding: const EdgeInsets.only(top: 13,left: 14),
                   child: Container(
@@ -32,8 +34,8 @@ class UpcomingItem extends StatelessWidget {
                       ),
                       child: Row(
                         children: [
-                          Text("${results.voteCount}",style: Theme.of(context).textTheme.titleSmall),
-                          Image(image: AssetImage("assets/images/star.png"))
+                          Text("${results.voteAverage}",style: Theme.of(context).textTheme.titleSmall),
+                          Image(image: AssetImage("assets/images/star1.png"))
                         ],
                       )),
                 ),

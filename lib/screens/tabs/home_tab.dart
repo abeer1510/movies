@@ -5,6 +5,7 @@ import 'package:news/api_manager.dart';
 import 'package:news/items/movie_item.dart';
 import 'package:news/items/upcoming_item.dart';
 import 'package:news/model/sources_response.dart';
+import 'package:news/screens/details_screen.dart';
 
 import '../../model/upcoming_response.dart';
 
