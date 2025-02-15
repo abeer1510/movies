@@ -2,8 +2,8 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:news/model/sources_response.dart';
-
-import '../screens/details_screen.dart';
+import 'package:news/model/upcoming_response.dart';
+import 'package:news/screens/details_screen.dart';
 
 class UpcomingItem extends StatelessWidget {
   Results results;
@@ -14,14 +14,14 @@ class UpcomingItem extends StatelessWidget {
       children: [
         ClipRRect(
             borderRadius: BorderRadius.circular(20),
-            child:
-            Stack(
+            child: Stack(
               children: [
 
                 GestureDetector(
                     onTap: (){
-                      Navigator.pushNamed(context, DetailsScreen.routeName);
-                    },
+                      Navigator.pushNamed(
+                        context, DetailsScreen.routName,
+                      );                  },
                     child: Image.network("https://image.tmdb.org/t/p/w500${results.posterPath}"??"",fit: BoxFit.fill,height: 220,width: 150,)),
 
                 Padding(
@@ -40,7 +40,8 @@ class UpcomingItem extends StatelessWidget {
                       )),
                 ),
               ],
-            ))      ],
+            ))
+      ],
     );
   }
 }

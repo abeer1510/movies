@@ -49,8 +49,7 @@ class MyApp extends StatelessWidget {
       locale: context.locale,
       debugShowCheckedModeBanner: false,
       initialRoute:
-      userProvider.currentUser!=null?
-      HomeScreen.routeName : SplashScreen.routeName,
+      HomeScreen.routeName,
       routes: {
         SplashScreen.routeName:(context)=>SplashScreen(),
         OnBoardingScreen.routeName:(context)=>OnBoardingScreen(),

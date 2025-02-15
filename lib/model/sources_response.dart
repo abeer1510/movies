@@ -58,7 +58,9 @@ class Results {
     backdropPath = json['backdrop_path'];
     genreIds = json['genre_ids'].cast<int>();
     id = json['id'];
-    originCountry = json['origin_country'].cast<String>();
+    originCountry = json['origin_country'] != null
+        ? List<String>.from(json['origin_country'])
+        : [];
     originalLanguage = json['original_language'];
     originalName = json['original_name'];
     overview = json['overview'];
