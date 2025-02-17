@@ -205,6 +205,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: InkWell(
                           onTap: (){
                             Navigator.pushNamed(context, HomeScreen.routeName);
+                            print("${userProvider.userModel?.name}");
+
                           },
                           child: Text('login'.tr(),
                               style: GoogleFonts.inter(

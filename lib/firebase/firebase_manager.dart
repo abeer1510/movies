@@ -15,6 +15,8 @@ class FirebaseManager {
         password: password,
       );
       onSuccess();
+      UserModel model=UserModel(id: credential.user!.uid, name: name, email: email, createAt: DateTime.now().millisecondsSinceEpoch);
+      await addUser(model);
       credential.user!.sendEmailVerification();
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
@@ -60,6 +62,11 @@ class FirebaseManager {
         }, toFirestore: (value, _) {
       return value.toJson();
     });
+  }
+  static Future<void> addUser(UserModel model) {
+    var collection = getUsersCollection();
+    var docRef = collection.doc(model.id);
+    return docRef.set(model);
   }
 
   static Future<UserModel?> getUser(String id)async{
