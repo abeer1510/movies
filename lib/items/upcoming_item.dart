@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:news/model/sources_response.dart';
 import 'package:news/model/upcoming_response.dart';
+
 import 'package:news/screens/details_screen.dart';
 
 class UpcomingItem extends StatelessWidget {
@@ -16,7 +17,9 @@ class UpcomingItem extends StatelessWidget {
             borderRadius: BorderRadius.circular(20),
             child: Stack(
               children: [
-                Image.network("https://image.tmdb.org/t/p/w500${results.posterPath}"??"",fit: BoxFit.fill,height: 220,width: 150,),
+                GestureDetector(
+
+                    child: Image.network("https://image.tmdb.org/t/p/w500${results.posterPath}"??"",fit: BoxFit.fill,height: 220,width: 150,)),
                 Padding(
                   padding: const EdgeInsets.only(top: 13,left: 14),
                   child: Container(

@@ -100,132 +100,161 @@
 
 
 
-
-
-
-
-
-
-
 import 'package:flutter/material.dart';
 import 'package:news/api_manager.dart';
 import 'package:news/items/image_item.dart';
-import 'package:news/model/detailsimage_response.dart';
+import 'package:news/model/image_response.dart';
+import 'package:news/model/movie_details_response.dart';
 import 'package:news/model/sources_response.dart';
 
-class DetailsScreen extends StatelessWidget {
-  static const String routName="DetailsScreen";
+class DetailsScreen extends StatefulWidget {
+  static const String routName = "DetailsScreen";
+  final int movieId;
   final Results movie;
-  int? seriesId;
 
+  DetailsScreen({super.key, required this.movieId, required this.movie});
 
+  @override
+  State<DetailsScreen> createState() => _DetailsScreenState();
+}
 
-  DetailsScreen({super.key, required this.movie,required this.seriesId});
+class _DetailsScreenState extends State<DetailsScreen> {
+  late Future<ImageResponse> movieImagesFuture;
+  late Future<MovieDetailsResponse> movieDetailsFuture;
+  late Future<SourcesResponse> movieSourcesFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    movieImagesFuture = ApiManager.getMovieImages(widget.movieId);
+    movieDetailsFuture = ApiManager.getDetails(widget.movieId);
+    movieSourcesFuture = ApiManager.getPopular();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final movieId = widget.movieId;
+    final movie = widget.movie;
+
     return Scaffold(
-      appBar: AppBar(leading: Icon(Icons.arrow_back_ios_new,color: Colors.white,),),
+      appBar: AppBar(),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            FutureBuilder<DetailsImageResponse>(future: ApiManager.getdetailsimage("$seriesId"),
-                builder: (context,snapshot){
-                  if(snapshot.connectionState == ConnectionState.waiting){
-                    return Center(child: CircularProgressIndicator());
-                  }
-                  if(snapshot.hasError){
-                    return Center(child: Text("Something Went Wrong",style: Theme.of(context).textTheme.titleLarge,));
-                  }
-                  var data = snapshot.data?.logos??[];
-                  return Column(
-                    children: [
-                      Container(
-                        height: 400,
-                        color: Colors.cyan,
-                      ),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: ElevatedButton(
-                              onPressed: () {},
-                              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                              child: Text("Watch",style: Theme.of(context).textTheme.titleMedium,),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Container(
-                              padding: EdgeInsets.symmetric(vertical: 7,horizontal: 10),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                color: Color(0xff282A28),
-                              ),
-                              child: Row(
-                                children: [
-                                  Image(image: AssetImage("assets/images/love.png")),
-                                  SizedBox(width: 10,),
-                                  Text("${movie.popularity}",style: Theme.of(context).textTheme.titleSmall),
-                                ],
-                              )),
-                          Container(
-                              padding: EdgeInsets.symmetric(vertical: 7,horizontal: 10),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                color: Color(0xff282A28),
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Image(image: AssetImage("assets/images/time.png")),
-                                  SizedBox(width: 10,),
-                                  Text("${movie.voteCount}",style: Theme.of(context).textTheme.titleSmall),
-                                ],
-                              )),
-                          Container(
-                              padding: EdgeInsets.symmetric(vertical: 7,horizontal: 10),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                color: Color(0xff282A28),
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Image(image: AssetImage("assets/images/star.png")),
-                                  SizedBox(width: 10,),
-                                  Text("${movie.voteAverage}",style: Theme.of(context).textTheme.titleSmall),
-                                ],
-                              )),
-                        ],),
-                      ListView.separated(scrollDirection: Axis.vertical,
-                        shrinkWrap: true,
-                        physics: NeverScrollableScrollPhysics(),
-                        itemBuilder: (context,index){
-                          return ImageItem(logos: snapshot.data!.logos![index]) ;
-                        },itemCount:snapshot.data?.logos?.length??0,
-                        separatorBuilder: (context,index)=>SizedBox(height: 10,),),
+            Stack(
+              alignment: Alignment.center,
+              children: [
+                movie.posterPath != null
+                    ? Image.network("https://image.tmdb.org/t/p/w500${movie.posterPath}")
+                    : Placeholder(fallbackHeight: 200, fallbackWidth: double.infinity),
+                Column(
+                  children: [
+                    Image.asset("assets/images/video.png"),
+                  ],
+                ),
+              ],
+            ),
+            Text(movie.name ?? "No Title", style: Theme.of(context).textTheme.titleLarge),
+            Text(
+              movie.firstAirDate != null && movie.firstAirDate!.length >= 4
+                  ? movie.firstAirDate!.substring(0, 4)
+                  : "No Date",
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {},
+                    style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                    child: Text("Watch", style: Theme.of(context).textTheme.titleMedium),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                infoContainer("assets/images/love.png", movie.popularity.toString()),
+                infoContainer("assets/images/time.png", movie.voteCount.toString()),
+                infoContainer("assets/images/star.png", movie.voteAverage.toString()),
+              ],
+            ),
+            SizedBox(height: 10),
+            sectionTitle("Screen Shots"),
+            FutureBuilder<ImageResponse>(
+              future: movieImagesFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                }
+                if (snapshot.hasError) {
+                  return Center(child: Text("Error: ${snapshot.error}"));
+                }
 
-                      Text(
-                          movie.name ?? "No Title",
-                          style: Theme.of(context).textTheme.titleMedium),
-                      SizedBox(height: 20),
-                      Text(movie.overview ?? "No Overview",
-                          style: Theme.of(context).textTheme.titleSmall)
-                    ],
-                  );
+                var backdrops = snapshot.data?.backdrops ?? [];
+                if (backdrops.isEmpty) {
+                  return Center(child: Text("No images available"));
+                }
 
-                }),
-
-
-
-
-
+                return SizedBox(
+                  height: 200,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: backdrops.length,
+                    itemBuilder: (context, index) {
+                      return ImageItem(backdrops: backdrops[index]);
+                    },
+                  ),
+                );
+              },
+            ),
+            sectionTitle("Similar"),
+            Container(
+              height: 300,
+              color: Colors.cyanAccent,
+            ),
+            sectionTitle("Summary"),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(movie.overview ?? "No Overview",
+                  style: Theme.of(context).textTheme.titleSmall),
+            ),
           ],
         ),
       ),
+    );
+  }
+
+  infoContainer(String imagePath, String text) {
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: 7, horizontal: 10),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        color: Color(0xff282A28),
+      ),
+      child: Row(
+        children: [
+          Image.asset(imagePath),
+          SizedBox(width: 10),
+          Text(text, style: Theme.of(context).textTheme.titleSmall),
+        ],
+      ),
+    );
+  }
+
+  sectionTitle(String title) {
+    return Row(
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          child: Text(
+            title,
+            style: Theme.of(context).textTheme.titleMedium!.copyWith(fontWeight: FontWeight.w700),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -234,6 +263,396 @@ class DetailsScreen extends StatelessWidget {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// import 'package:flutter/material.dart';
+// import 'package:news/api_manager.dart';
+// import 'package:news/items/image_item.dart';
+// import 'package:news/model/image_response.dart';
+// import 'package:news/model/movie_details_response.dart';
+// import 'package:news/model/sources_response.dart';
+//
+// class DetailsScreen extends StatefulWidget {
+//   static const String routName = "DetailsScreen";
+//   final int movieId;
+//   Results movie;
+//
+//   DetailsScreen({super.key, required this.movieId,required this .movie,});
+//
+//   @override
+//   State<DetailsScreen> createState() => _DetailsScreenState();
+// }
+//
+// class _DetailsScreenState extends State<DetailsScreen> {
+//   @override
+//   Widget build(BuildContext context) {
+//     return FutureBuilder<ImageResponse>(
+//       future: ApiManager.getMovieImages(widget.movieId),
+//       builder: (context, snapshot) {
+//         if (snapshot.connectionState == ConnectionState.waiting) {
+//           return Center(child: CircularProgressIndicator());
+//         }
+//         if (snapshot.hasError) {
+//           return Center(child: Text("Error: ${snapshot.error}"));
+//         }
+//
+//         var data = snapshot.data?.backdrops??[];
+//
+//
+//         return FutureBuilder<MovieDetailsResponse>(
+//           future: ApiManager.getDetails(widget.movieId),
+//           builder: (context, snapshot) {
+//             if (snapshot.connectionState == ConnectionState.waiting) {
+//               return Center(child: CircularProgressIndicator());
+//             }
+//             if (snapshot.hasError) {
+//               return Center(child: Text("Error: ${snapshot.error}"));
+//             }
+//
+//             var movieDetails = snapshot.data;
+//             if (movieDetails == null) {
+//               return Center(child: Text("No details available"));
+//             }
+//
+//             return FutureBuilder<SourcesResponse>(
+//               future: ApiManager.getPopular(),
+//               builder: (context, snapshot) {
+//                 if (snapshot.connectionState == ConnectionState.waiting) {
+//                   return Center(child: CircularProgressIndicator());
+//                 }
+//                 if (snapshot.hasError) {
+//                   return Center(child: Text("Error: ${snapshot.error}"));
+//                 }
+//
+//                 var movieDetails = snapshot.data;
+//                 if (movieDetails == null) {
+//                   return Center(child: Text("No details available"));
+//                 }
+//
+//                 return Scaffold(
+//                   appBar: AppBar(),
+//                   body: Column(
+//                 children: [
+//                   Stack(
+//                     alignment: Alignment.center,
+//                     children: [
+//                       Image.network("https://image.tmdb.org/t/p/w500${widget.movie.posterPath}"??""),
+//                       Column(
+//                         children: [
+//                           Image(image: AssetImage("assets/images/video.png")),
+//                         ],
+//                       ),
+//                     ],
+//                   ),
+//                   Text(
+//                       widget.movie.name ?? "No Title",
+//                       style: Theme.of(context).textTheme.titleLarge),
+//                   Text(
+//                     widget.movie.firstAirDate != null && widget.movie.firstAirDate!.length >= 4
+//                         ? widget.movie.firstAirDate!.substring(0, 4)
+//                         : "No Date",
+//                     style: Theme.of(context).textTheme.titleLarge,
+//                   ),
+//                   Row(
+//                     children: [
+//                       Expanded(
+//                         child: ElevatedButton(
+//                           onPressed: () {},
+//                           style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+//                           child: Text("Watch",style: Theme.of(context).textTheme.titleMedium,),
+//                         ),
+//                       ),
+//                     ],
+//                   ),
+//                   SizedBox(height: 10,),
+//                   Row(
+//                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                     children: [
+//                       Container(
+//                           padding: EdgeInsets.symmetric(vertical: 7,horizontal: 10),
+//                           decoration: BoxDecoration(
+//                             borderRadius: BorderRadius.circular(10),
+//                             color: Color(0xff282A28),
+//                           ),
+//                           child: Row(
+//                             children: [
+//                               Image(image: AssetImage("assets/images/love.png")),
+//                               SizedBox(width: 10,),
+//                               Text("${widget.movie.popularity}",style: Theme.of(context).textTheme.titleSmall),
+//                             ],
+//                           )),
+//                       Container(
+//                           padding: EdgeInsets.symmetric(vertical: 7,horizontal: 10),
+//                           decoration: BoxDecoration(
+//                             borderRadius: BorderRadius.circular(10),
+//                             color: Color(0xff282A28),
+//                           ),
+//                           child: Row(
+//                             mainAxisAlignment: MainAxisAlignment.center,
+//                             children: [
+//                               Image(image: AssetImage("assets/images/time.png")),
+//                               SizedBox(width: 10,),
+//                               Text("${widget.movie.voteCount}",style: Theme.of(context).textTheme.titleSmall),
+//                             ],
+//                           )),
+//                       Container(
+//                           padding: EdgeInsets.symmetric(vertical: 7,horizontal: 10),
+//                           decoration: BoxDecoration(
+//                             borderRadius: BorderRadius.circular(10),
+//                             color: Color(0xff282A28),
+//                           ),
+//                           child: Row(
+//                             mainAxisAlignment: MainAxisAlignment.center,
+//                             children: [
+//                               Image(image: AssetImage("assets/images/star.png")),
+//                               SizedBox(width: 10,),
+//                               Text("${widget.movie.voteAverage}",style: Theme.of(context).textTheme.titleSmall),
+//                             ],
+//                           )),
+//                     ],),
+//                   SizedBox(height: 10,),
+//                   Row(
+//                     children: [
+//                       Text("Screen Shots",style: Theme.of(context).textTheme.titleMedium!.
+//                       copyWith(fontWeight: FontWeight.w700),),
+//                     ],
+//                   ),
+//                   Container(
+//                     height: 300,
+//                     color: Colors.cyanAccent,
+//                   ),
+//                   Row(
+//                     children: [
+//                       Text("Similar ",style: Theme.of(context).textTheme.titleMedium!.
+//                       copyWith(fontWeight: FontWeight.w700),),
+//                     ],
+//                   ),
+//                   Container(
+//                     height: 300,
+//                     color: Colors.cyanAccent,
+//                   ),
+//                   Row(
+//               children: [
+//               Text("Summary ",style: Theme.of(context).textTheme.titleMedium!.
+//               copyWith(fontWeight: FontWeight.w700),),
+//               ],),
+//                   ImageItem(backdrops: snapshot.data!.backdrops![index]),
+//                   SizedBox(height: 20),
+//                   Text(widget.movie.overview ?? "No Overview",
+//                       style: Theme.of(context).textTheme.titleSmall),
+//
+//                 ],
+//                ),
+//                 );
+//               },
+//             );
+//           },
+//         );
+//       },
+//     );
+//   }
+// }
+
+
+
+// import 'package:flutter/material.dart';
+// import 'package:news/api_manager.dart';
+// import 'package:news/items/image_item.dart';
+// import 'package:news/items/similar_item.dart';
+// import 'package:news/model/image_response.dart';
+// import 'package:news/model/movieSimilar_Response.dart';
+// import 'package:news/model/prowesimage_response.dart';
+// import 'package:news/model/sources_response.dart';
+// import 'package:news/model/upcoming_response.dart';
+//
+// class DetailsScreen extends StatefulWidget {
+//   static const String routName="DetailsScreen";
+//   final Results movie;
+//   int movieId;
+//
+//
+//
+//   DetailsScreen({super.key, required this.movie,  required this.movieId});
+//
+//   @override
+//   State<DetailsScreen> createState() => _DetailsScreenState();
+// }
+//
+// class _DetailsScreenState extends State<DetailsScreen> {
+//   @override
+//   Widget build(BuildContext context) {
+//     return FutureBuilder<ImageResponse>(
+//         future: ApiManager.getMovieImages(widget.movieId),
+//     builder: (context, snapshot) {
+//     if (snapshot.connectionState == ConnectionState.waiting) {
+//     return Center(child: CircularProgressIndicator());
+//     }
+//     if (snapshot.hasError) {
+//     return Center(child: Text("Error: ${snapshot.error}"));
+//     }
+//
+//     var movieDetails = snapshot.data;
+//     if (movieDetails == null) {
+//     return Center(child: Text("No details available"));}
+//
+//
+//     return Scaffold(
+//       appBar: AppBar(leading: Icon(Icons.arrow_back_ios_new,color: Colors.white,),),
+//       body: SingleChildScrollView(
+//         child:Column(
+//                 children: [
+//                   Stack(
+//                     alignment: Alignment.center,
+//                     children: [
+//                       Image.network("https://image.tmdb.org/t/p/w500${widget.movie.posterPath}"??""),
+//                       Column(
+//                         children: [
+//                           Image(image: AssetImage("assets/images/video.png")),
+//                         ],
+//                       ),
+//                     ],
+//                   ),
+//                   Text(
+//                       widget.movie.name ?? "No Title",
+//                       style: Theme.of(context).textTheme.titleLarge),
+//                   Text(
+//                     widget.movie.firstAirDate != null && widget.movie.firstAirDate!.length >= 4
+//                         ? widget.movie.firstAirDate!.substring(0, 4)
+//                         : "No Date",
+//                     style: Theme.of(context).textTheme.titleLarge,
+//                   ),
+//                   Row(
+//                     children: [
+//                       Expanded(
+//                         child: ElevatedButton(
+//                           onPressed: () {},
+//                           style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+//                           child: Text("Watch",style: Theme.of(context).textTheme.titleMedium,),
+//                         ),
+//                       ),
+//                     ],
+//                   ),
+//                   SizedBox(height: 10,),
+//                   Row(
+//                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                     children: [
+//                       Container(
+//                           padding: EdgeInsets.symmetric(vertical: 7,horizontal: 10),
+//                           decoration: BoxDecoration(
+//                             borderRadius: BorderRadius.circular(10),
+//                             color: Color(0xff282A28),
+//                           ),
+//                           child: Row(
+//                             children: [
+//                               Image(image: AssetImage("assets/images/love.png")),
+//                               SizedBox(width: 10,),
+//                               Text("${widget.movie.popularity}",style: Theme.of(context).textTheme.titleSmall),
+//                             ],
+//                           )),
+//                       Container(
+//                           padding: EdgeInsets.symmetric(vertical: 7,horizontal: 10),
+//                           decoration: BoxDecoration(
+//                             borderRadius: BorderRadius.circular(10),
+//                             color: Color(0xff282A28),
+//                           ),
+//                           child: Row(
+//                             mainAxisAlignment: MainAxisAlignment.center,
+//                             children: [
+//                               Image(image: AssetImage("assets/images/time.png")),
+//                               SizedBox(width: 10,),
+//                               Text("${widget.movie.voteCount}",style: Theme.of(context).textTheme.titleSmall),
+//                             ],
+//                           )),
+//                       Container(
+//                           padding: EdgeInsets.symmetric(vertical: 7,horizontal: 10),
+//                           decoration: BoxDecoration(
+//                             borderRadius: BorderRadius.circular(10),
+//                             color: Color(0xff282A28),
+//                           ),
+//                           child: Row(
+//                             mainAxisAlignment: MainAxisAlignment.center,
+//                             children: [
+//                               Image(image: AssetImage("assets/images/star.png")),
+//                               SizedBox(width: 10,),
+//                               Text("${widget.movie.voteAverage}",style: Theme.of(context).textTheme.titleSmall),
+//                             ],
+//                           )),
+//                     ],),
+//                   SizedBox(height: 10,),
+//                   Row(
+//                     children: [
+//                       Text("Screen Shots",style: Theme.of(context).textTheme.titleMedium!.
+//                       copyWith(fontWeight: FontWeight.w700),),
+//                     ],
+//                   ),
+//                   Container(
+//                     height: 300,
+//                     color: Colors.cyanAccent,
+//                   ),
+//                   Row(
+//                     children: [
+//                       Text("Similar ",style: Theme.of(context).textTheme.titleMedium!.
+//                       copyWith(fontWeight: FontWeight.w700),),
+//                     ],
+//                   ),
+//                   Container(
+//                     height: 300,
+//                     color: Colors.cyanAccent,
+//                   ),
+//                   Row(
+//               children: [
+//               Text("Summary ",style: Theme.of(context).textTheme.titleMedium!.
+//               copyWith(fontWeight: FontWeight.w700),),
+//               ],),
+//                   SizedBox(
+//                     height: 300,
+//                     child: ListView.separated(
+//                       shrinkWrap: true,
+//                       physics: NeverScrollableScrollPhysics(),
+//                       itemBuilder: (context,index){
+//                         return ImageItem(backdrop: snapshot.data!.backdrops![index]) ;
+//                       },itemCount:snapshot.data?.backdrops?.length??0,
+//                       separatorBuilder: (context,index)=>SizedBox(height: 10,),),
+//                   ),
+//
+//                   SizedBox(height: 20),
+//                   Text(widget.movie.overview ?? "No Overview",
+//                       style: Theme.of(context).textTheme.titleSmall),
+//
+//                 ],
+//                );
+//
+//             }),
+//       ),
+//     );
+//   }
+// }
 
 
 // import 'package:flutter/material.dart';

@@ -1,7 +1,8 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
-import 'package:news/model/detailsimage_response.dart';
+import 'package:news/model/image_response.dart';
+import 'package:news/model/movie_details_response.dart';
 import 'package:news/model/sources_response.dart';
 
 import 'model/prowesimage_response.dart';
@@ -53,14 +54,32 @@ class ApiManager{
     }
   }
 
-  static Future<DetailsImageResponse> getdetailsimage(String sourceId) async {
-    Uri url = Uri.parse("https://api.themoviedb.org/3/network/$sourceId/images?api_key=1af5751239f6c52b196a77e23dcf8416");
+
+
+
+  static Future<ImageResponse> getMovieImages(int movieId) async {
+    final Uri url = Uri.parse("https://api.themoviedb.org/3/movie/$movieId/images?api_key=1af5751239f6c52b196a77e23dcf8416");
 
     http.Response response = await http.get(url);
-    var json = jsonDecode(response.body);
-    DetailsImageResponse detailsimageResponse = DetailsImageResponse.fromJson(json);
-    return detailsimageResponse;
+    var json =jsonDecode(response.body);
+    ImageResponse imageResponse=ImageResponse.fromJson(json);
+    return imageResponse;
   }
+
+
+
+  static Future<MovieDetailsResponse> getDetails(int movieId) async {
+    final Uri url = Uri.parse("https://api.themoviedb.org/3/movie/$movieId?key=1af5751239f6c52b196a77e23dcf8416");
+
+    http.Response response = await http.get(url);
+    var json =jsonDecode(response.body);
+    MovieDetailsResponse movieDetailsResponse=MovieDetailsResponse.fromJson(json);
+    return movieDetailsResponse;
+
+  }
+
+
+
 
 
 

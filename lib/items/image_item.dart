@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:news/model/detailsimage_response.dart';
+import 'package:news/model/image_response.dart';
 
 class ImageItem extends StatelessWidget {
-   ImageItem({super.key,required this.logos});
-  Logos logos;
+   ImageItem({super.key,required this.backdrops});
+   Backdrops backdrops;
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       body: ClipRRect(
-        child: Image.network("https://image.tmdb.org/t/p/w500${logos.filePath}"??""),
+        child: GestureDetector(
+
+            child: Image.network("https://image.tmdb.org/t/p/w500${backdrops.filePath}"??"")),
       ),
     );
   }

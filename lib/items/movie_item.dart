@@ -74,8 +74,7 @@ class MovieItem extends StatelessWidget {
                     MaterialPageRoute(
                       builder: (context) =>
                           DetailsScreen(
-                             seriesId: results.id,
-                            movie: results,
+                            movieId: results.id!,movie: results,
                           ),
                     ),
                   );
