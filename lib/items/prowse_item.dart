@@ -17,7 +17,9 @@ class ProwseItem extends StatelessWidget {
       children: [
         ClipRRect(
             borderRadius: BorderRadius.circular(20),
-            child: Image.network("https://image.tmdb.org/t/p/w500${results.posterPath}"??"",fit: BoxFit.fill,width: 200,)),
+            child: GestureDetector(
+
+                child: Image.network("https://image.tmdb.org/t/p/w500${results.posterPath}"??"",fit: BoxFit.fill,width: 200,))),
         Padding(
           padding: const EdgeInsets.only(top: 13,left: 14,),
           child: Row(
