@@ -110,7 +110,6 @@ class _LoginScreenState extends State<LoginScreen> {
                           if(formKey.currentState!.validate()){
                             bool isLoggedIn = await Provider.of<UserProvider>(context, listen: false).
                             login(emailController.text, passwordController.text);
-
                             if (isLoggedIn) {
                               // Successfully logged in, navigate to the Home page
                               Navigator.pushReplacement(
@@ -208,7 +207,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 ElevatedButton(
                     onPressed: () {
-                      FirebaseManager.signInWithGoogle;
                     },
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 14),

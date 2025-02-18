@@ -56,7 +56,6 @@ class Results {
   Results.fromJson(Map<String, dynamic> json) {
     adult = json['adult'];
     backdropPath = json['backdrop_path'];
-    genreIds = json['genre_ids'].cast<int>();
     id = json['id'];
     originCountry = json['origin_country'] != null
         ? List<String>.from(json['origin_country'])
@@ -68,8 +67,11 @@ class Results {
     posterPath = json['poster_path'];
     firstAirDate = json['first_air_date'];
     name = json['name'];
-    voteAverage = json['vote_average'];
-    voteCount = json['vote_count'];
+    voteAverage = (json['vote_average'] ?? 0).toDouble();
+    voteCount = json['vote_count'] ?? 0;
+    genreIds = json['genre_ids'] != null
+        ? List<int>.from(json['genre_ids'])
+        : [];
   }
 
 }

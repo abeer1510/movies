@@ -5,6 +5,8 @@ class UserModel {
   String confirmPassword;
   String phone;
   int avaterId;
+  List<int> history;
+  List<int> favorites;
 
   UserModel({
     required this.name,
@@ -13,6 +15,8 @@ class UserModel {
     required this.confirmPassword,
     required this.phone,
     required this.avaterId,
+    this.history = const [],
+    this.favorites = const [],
   });
 
   Map<String, dynamic> toJson() {
@@ -23,6 +27,8 @@ class UserModel {
       "confirmPassword": confirmPassword,
       "phone": phone,
       "avaterId": avaterId,
+      "history": history,
+      "favorites": favorites,
     };
   }
   factory UserModel.fromJson(Map<String, dynamic> json) {
@@ -33,6 +39,8 @@ class UserModel {
       confirmPassword: json['confirmPassword'] ?? '',
       phone: json['phone'] ?? '',
       avaterId: json['avaterId'] ?? 0,
+      history: List<int>.from(json['history'] ?? []),
+      favorites: List<int>.from(json['favorites'] ?? []),
     );
   }
 }

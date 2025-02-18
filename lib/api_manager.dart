@@ -1,12 +1,14 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
-import 'package:news/model/detailsimage_response.dart';
 import 'package:news/model/sources_response.dart';
 
-import 'model/prowesimage_response.dart';
-import 'model/prowselist_response.dart';
+import 'model/browse_image_response.dart';
+import 'model/browse_list_response.dart';
+import 'model/image_response.dart';
+import 'model/movie_details_response.dart';
 import 'model/upcoming_response.dart';
+import 'model/user_model.dart';
 
 class ApiManager{
   static Future<SourcesResponse> getPopular()async{
@@ -17,8 +19,6 @@ class ApiManager{
     SourcesResponse sourcesResponse=SourcesResponse.fromJson(json);
     return sourcesResponse;
   }
-
-  // ApiService class
 
   static Future<SourcesResponse> getPopularByName(String name)async{
     Uri url=Uri.parse("https://api.themoviedb.org/3/search/movie?api_key=2b0d978a962d720636b46566d80b8e37&query=$name");
@@ -40,17 +40,16 @@ class ApiManager{
     return upcomingResponse;
   }
 
-  static Future<prowselistResponse> getprowiselist()async{
+  static Future<BrowseListResponse> getBrowseList()async{
     Uri url=Uri.parse("https://api.themoviedb.org/3/genre/movie/list?api_key=1af5751239f6c52b196a77e23dcf8416");
 
     http.Response response = await http.get(url);
     var json =jsonDecode(response.body);
-    prowselistResponse proweslistResponse=prowselistResponse.fromJson(json);
-    return proweslistResponse;
+    BrowseListResponse browseListResponse=BrowseListResponse.fromJson(json);
+    return browseListResponse;
   }
 
-
-  static Future<prowseimageResponse> getprowiseimage(String sourceId) async {
+  static Future<BrowseImageResponse> getBrowseImage(String sourceId) async {
     Uri url = Uri.parse(
         "https://api.themoviedb.org/3/discover/movie?api_key=1af5751239f6c52b196a77e23dcf8416&with_genres=$sourceId");
 
@@ -58,40 +57,132 @@ class ApiManager{
 
     if (response.statusCode == 200) {
       var json = jsonDecode(response.body);
-      prowseimageResponse prowesimageResponse = prowseimageResponse.fromJson(json);
+      BrowseImageResponse prowesimageResponse = BrowseImageResponse.fromJson(json);
       return prowesimageResponse;
     } else {
       throw Exception("Failed to load movies");
     }
   }
 
-  static Future<DetailsImageResponse> getdetailsimage(String sourceId) async {
-    Uri url = Uri.parse("https://api.themoviedb.org/3/network/$sourceId/images?api_key=1af5751239f6c52b196a77e23dcf8416");
+  static Future<ImageResponse> getMovieImages(int movieId) async {
+    final Uri url = Uri.parse("https://api.themoviedb.org/3/movie/$movieId/images?api_key=1af5751239f6c52b196a77e23dcf8416");
 
     http.Response response = await http.get(url);
-    var json = jsonDecode(response.body);
-    DetailsImageResponse detailsimageResponse = DetailsImageResponse.fromJson(json);
-    return detailsimageResponse;
+    var json =jsonDecode(response.body);
+    ImageResponse imageResponse=ImageResponse.fromJson(json);
+    return imageResponse;
   }
 
+  static Future<MovieDetailsResponse> getDetails(int movieId) async {
+    final Uri url = Uri.parse("https://api.themoviedb.org/3/movie/$movieId?key=1af5751239f6c52b196a77e23dcf8416");
 
+    http.Response response = await http.get(url);
+    var json =jsonDecode(response.body);
+    MovieDetailsResponse movieDetailsResponse=MovieDetailsResponse.fromJson(json);
+    return movieDetailsResponse;
 
-  static Future<List<Map<String, dynamic>>> getTvShowVideos(int seriesId) async {
-     String apiKey = "1af5751239f6c52b196a77e23dcf8416";
-     String baseUrl = "https://api.themoviedb.org/3";
-  Uri url = Uri.parse("$baseUrl/tv/$seriesId/videos?api_key=$apiKey");
-
-  final response = await http.get(url);
-     print("API Response Code: ${response.statusCode}");
-     print("API Response Body: ${response.body}");
-  if (response.statusCode == 200) {
-  final jsonData = jsonDecode(response.body);
-  print("Parsed Videos: ${jsonData['results']}");
-  return List<Map<String, dynamic>>.from(jsonData['results']);
-  } else {
-  throw Exception("Failed to load TV show videos");
   }
+
+  static Future<void> updateMoviesWithPosters(SourcesResponse? sourcesResponse) async {
+    if (sourcesResponse == null || sourcesResponse.results == null) return;
+
+    for (var result in sourcesResponse.results!) {
+      if (result.id != null) {
+        String? backdropUrl = await fetchMovieBackdrop(result.id!);
+        result.backdropPath = backdropUrl; // Update the backdropPath
+      }
+    }
   }
+
+  static Future<String?> fetchMovieBackdrop(int movieId) async {
+    const String apiKey = "1af5751239f6c52b196a77e23dcf8416"; // Replace with your TMDb API Key
+    final Uri movieUrl = Uri.parse(
+        "https://api.themoviedb.org/3/movie/$movieId?api_key=$apiKey&language=en-US");
+    final Uri tvUrl = Uri.parse(
+        "https://api.themoviedb.org/3/tv/$movieId?api_key=$apiKey&language=en-US");
+    try {
+      final movieResponse = await http.get(movieUrl);
+      if (movieResponse.statusCode == 200) {
+        final Map<String, dynamic> data = jsonDecode(movieResponse.body);
+        return data['poster_path'] != null
+            ? "https://image.tmdb.org/t/p/w500${data['poster_path']}"
+            : null;
+      }
+      final tvResponse = await http.get(tvUrl);
+      if (tvResponse.statusCode == 200) {
+        final Map<String, dynamic> data = jsonDecode(tvResponse.body);
+        return data['poster_path'] != null
+            ? "https://image.tmdb.org/t/p/w500${data['poster_path']}"
+            : null;
+      }
+      print("Error fetching movie details: ${movieResponse.body}");
+        return null;
+      }
+     catch (e) {
+      print("Exception: $e");
+      return null;
+    }
+  }
+
+  static Future<Results?> fetchMovieDetails(int movieId) async {
+    const String apiKey = "1af5751239f6c52b196a77e23dcf8416"; // Replace with your TMDb API Key
+
+    final Uri url = Uri.parse(
+        "https://api.themoviedb.org/3/movie/$movieId?api_key=$apiKey&language=en-US");
+
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = jsonDecode(response.body);
+        if (data.isEmpty || data['id'] == null) {
+          print("❌ Error: No movie data found for ID: $movieId");
+          return null;
+        }
+        return Results.fromJson(data); // Convert JSON to Results object
+      } else {
+        print("❌ Error fetching movie details: ${response.body}");
+        return null;
+      }
+    } catch (e) {
+      print("❌ Exception: $e");
+      return null;
+    }
+  }
+
+  static Future<Map<String, dynamic>> registerUser(UserModel userModel) async {
+    Uri url = Uri.parse("https://route-movie-apis.vercel.app/auth/register");
+
+    try {
+      final response = await http.post(url,
+          headers: {"Content-Type": "application/json"},
+          body: jsonEncode(
+              userModel.toJson()
+          ));
+      print("Response Status Code: ${response.statusCode}");
+      print("Response Body: ${response.body}");
+      print(jsonEncode(userModel.toJson()));  // Debugging: Check the serialized data
+
+      if (response.statusCode == 201||response.statusCode == 200) {
+        Map<String, dynamic> responseBody = jsonDecode(response.body);
+        String errorMessage = responseBody["error"] ?? "Registration failed";
+        return {
+          "success": true,
+          "message": errorMessage,
+        };
+      } else {
+        return {
+          "success": false,
+          "message":"Registration failed with status: ${response.statusCode}",
+        };
+      }
+    } catch (error) {
+      return {
+        "success": false,
+        "message": "An error occurred : $error",
+      };
+    }
+  }
+
 
 }
 

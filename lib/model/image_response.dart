@@ -60,18 +60,18 @@ class Posters {
 
   Posters.fromJson(dynamic json) {
     aspectRatio = json['aspect_ratio'];
-    height = json['height'];
+    width = (json['width'] is double) ? (json['width'] as double).toInt() : json['width'];
+    height = (json['height'] is double) ? (json['height'] as double).toInt() : json['height'];
     iso6391 = json['iso_639_1'];
     filePath = json['file_path'];
-    voteAverage = json['vote_average'];
+    voteAverage = (json['vote_average'] is int) ? (json['vote_average'] as int).toDouble() : json['vote_average'];
     voteCount = json['vote_count'];
-    width = json['width'];
   }
   double? aspectRatio;
   int? height;
   String? iso6391;
   String? filePath;
-  int? voteAverage;
+  double? voteAverage;
   int? voteCount;
   int? width;
 

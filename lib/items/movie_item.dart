@@ -52,10 +52,14 @@
 
 import 'package:flutter/material.dart';
 import 'package:news/model/sources_response.dart';
+import 'package:news/model/user_model.dart';
+import 'package:news/provider/auth_provider.dart';
 import 'package:news/screens/details_screen.dart';
+import 'package:provider/provider.dart';
 
 class MovieItem extends StatelessWidget {
   final Results results;
+
 
   MovieItem({super.key, required this.results});
 

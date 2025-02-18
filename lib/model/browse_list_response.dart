@@ -1,9 +1,9 @@
-class prowselistResponse {
+class BrowseListResponse {
   List<Genres>? genres;
 
-  prowselistResponse({this.genres});
+  BrowseListResponse({this.genres});
 
-  prowselistResponse.fromJson(Map<String, dynamic> json) {
+  BrowseListResponse.fromJson(Map<String, dynamic> json) {
     if (json['genres'] != null) {
       genres = <Genres>[];
       json['genres'].forEach((v) {

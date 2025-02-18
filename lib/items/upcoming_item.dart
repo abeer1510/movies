@@ -7,7 +7,7 @@ import 'package:news/model/upcoming_response.dart';
 import 'package:news/screens/details_screen.dart';
 
 class UpcomingItem extends StatelessWidget {
-  Results1 results;
+  Results results;
   UpcomingItem({super.key,required this.results});
   @override
   Widget build(BuildContext context) {

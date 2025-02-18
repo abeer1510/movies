@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 import '../model/user_model.dart';
@@ -35,7 +34,7 @@ class FirebaseManager {
     }
   }*/
 
-  static Future<void> logIn(String email,String password,Function onSuccess,Function onLoading, Function onError) async{
+ /* static Future<void> logIn(String email,String password,Function onSuccess,Function onLoading, Function onError) async{
     try {
       onLoading();
       final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
@@ -56,7 +55,7 @@ class FirebaseManager {
         print('Wrong password provided for that user.');
       }*/
     }
-  }
+  }*/
 
   static CollectionReference <UserModel> getUsersCollection() {
     return FirebaseFirestore.instance.collection("Users").withConverter<UserModel>(
@@ -93,7 +92,7 @@ class FirebaseManager {
     return collection.doc(model.id).update(model.toJson());
   }*/
 
-  static forgetPassword(String email)async{
+ /* static forgetPassword(String email)async{
     await FirebaseAuth.instance
         .sendPasswordResetEmail(email: email);FirebaseAuth.instance.sendPasswordResetEmail(email: email).then((value) {
       print("Password reset email sent.");
@@ -121,5 +120,5 @@ class FirebaseManager {
 
   static Future<void> logOut(){
     return FirebaseAuth.instance.signOut();
-  }
+  }*/
 }

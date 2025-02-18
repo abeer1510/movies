@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:news/screens/history_screen.dart';
 import 'package:news/screens/login_screen.dart';
 import 'package:provider/provider.dart';
 
@@ -26,7 +27,7 @@ class ProfileTab extends StatelessWidget {
                 children: [
                   Column(
                     children: [
-                      Image.asset("assets/images/gamer_${userProvider.avatarId}.png"),
+                      Image.asset("assets/images/gamer${userProvider.userModel?.avaterId}.png"),
                       SizedBox(height: 16,),
                       Text("${userProvider.userName}",style: Theme.of(context).textTheme.headlineSmall,),
                     ],
@@ -76,9 +77,9 @@ class ProfileTab extends StatelessWidget {
                   SizedBox(width: 10,),
                   ElevatedButton(
                       onPressed: () {
-                        FirebaseManager.logOut().then((_){
-    Navigator.pushNamedAndRemoveUntil(context, LoginScreen.routeName, (route) => false,);
-                      });},
+                        userProvider.logout();
+                        Navigator.pushReplacementNamed(context, LoginScreen.routeName);
+                        },
                       style: ElevatedButton.styleFrom(
                         padding: EdgeInsets.symmetric(vertical: 8),
                         shape: RoundedRectangleBorder(
@@ -106,34 +107,49 @@ class ProfileTab extends StatelessWidget {
               ),
             ),
             SizedBox(height: 24,),
-            DefaultTabController(length: 2,
-                child: TabBar(
-                  isScrollable: false,
-                    dividerColor: Colors.transparent,
-                    indicatorColor: Theme.of(context).primaryColor,
-                    labelPadding: EdgeInsets.zero,
-                    tabs: [
-                      Column(
-                  children: [
-                    Icon(Icons.list,color: Theme.of(context).primaryColor,),
-                    SizedBox(height: 4,),
-                    Text("Watch List",style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w400),)
-                  ],
-                ),
-                      Column(
-                  children: [
-                    Icon(Icons.folder,color: Theme.of(context).primaryColor,),
-                    SizedBox(height: 4,),
-                    Text("History",style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w400),)
-                  ],
-                )
-                ])
-            ),
-
+        DefaultTabController(
+          length: 2,
+          child: Column(
+            children: [
+              TabBar(
+                isScrollable: false,
+                dividerColor: Colors.transparent,
+                indicatorColor: Theme.of(context).primaryColor,
+                labelPadding: EdgeInsets.zero,
+                tabs: [
+                  Column(
+                    children: [
+                      Icon(Icons.list, color: Theme.of(context).primaryColor),
+                      SizedBox(height: 4),
+                      Text(
+                        "Watch List",
+                        style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w400),
+                      )
+                    ],
+                  ),
+                  Column(
+                    children: [
+                      Icon(Icons.folder, color: Theme.of(context).primaryColor),
+                      SizedBox(height: 4),
+                      Text(
+                        "History",
+                        style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w400),
+                      )
+                    ],
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
             Expanded(child: Container(
                 color: Color(0xFF121312),
                 width: double.infinity,
-                child: Image.asset("assets/images/popcorn.png")))
+                child: InkWell(
+                    onTap: (){
+                      Navigator.pushNamed(context, HistoryScreen.routName);
+                    },
+                    child: Image.asset("assets/images/popcorn.png"))))
 
           ],
         ),

@@ -96,16 +96,16 @@
 //   }
 // }
 
-
-
-
-
 import 'package:flutter/material.dart';
 import 'package:news/api_manager.dart';
 import 'package:news/items/image_item.dart';
 import 'package:news/model/image_response.dart';
 import 'package:news/model/movie_details_response.dart';
 import 'package:news/model/sources_response.dart';
+import 'package:news/screens/screen_shots.dart';
+import 'package:provider/provider.dart';
+
+import '../provider/auth_provider.dart';
 
 class DetailsScreen extends StatefulWidget {
   static const String routName = "DetailsScreen";
@@ -135,99 +135,78 @@ class _DetailsScreenState extends State<DetailsScreen> {
   Widget build(BuildContext context) {
     final movieId = widget.movieId;
     final movie = widget.movie;
+    var userProvider=Provider.of<UserProvider>(context,listen: false);
 
     return Scaffold(
       appBar: AppBar(),
       body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Stack(
-              alignment: Alignment.center,
-              children: [
-                movie.posterPath != null
-                    ? Image.network("https://image.tmdb.org/t/p/w500${movie.posterPath}")
-                    : Placeholder(fallbackHeight: 200, fallbackWidth: double.infinity),
-                Column(
-                  children: [
-                    Image.asset("assets/images/video.png"),
-                  ],
-                ),
-              ],
-            ),
-            Text(movie.name ?? "No Title", style: Theme.of(context).textTheme.titleLarge),
-            Text(
-              movie.firstAirDate != null && movie.firstAirDate!.length >= 4
-                  ? movie.firstAirDate!.substring(0, 4)
-                  : "No Date",
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-            Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () {},
-                    style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                    child: Text("Watch", style: Theme.of(context).textTheme.titleMedium),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            children: [
+              Stack(
+                alignment: Alignment.center,
+                children: [
+                  movie.posterPath != null
+                      ? Image.network("https://image.tmdb.org/t/p/w500${movie.posterPath}",height: 300,width: double.infinity)
+                      : Placeholder(fallbackHeight: 200, fallbackWidth: double.infinity),
+                  Icon(Icons.play_circle_outline,color:Theme.of(context).primaryColor,size: 50,),
+                ],
+              ),
+              Text(movie.name ?? "No Title", style: Theme.of(context).textTheme.headlineMedium),
+              Text(
+                movie.firstAirDate != null && movie.firstAirDate!.length >= 4
+                    ? movie.firstAirDate!.substring(0, 4)
+                    : "No Date",
+                style: Theme.of(context).textTheme.headlineSmall,
+              ),
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        userProvider.addToHistory(movieId);
+                      },
+                      style: ElevatedButton.styleFrom(backgroundColor: Colors.red,shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12),
+                      )),
+                      child: Text("Watch", style: Theme.of(context).textTheme.headlineMedium),
+                    ),
                   ),
-                ),
-              ],
-            ),
-            SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                infoContainer("assets/images/love.png", movie.popularity.toString()),
-                infoContainer("assets/images/time.png", movie.voteCount.toString()),
-                infoContainer("assets/images/star.png", movie.voteAverage.toString()),
-              ],
-            ),
-            SizedBox(height: 10),
-            sectionTitle("Screen Shots"),
-            FutureBuilder<ImageResponse>(
-              future: movieImagesFuture,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
-                }
-                if (snapshot.hasError) {
-                  return Center(child: Text("Error: ${snapshot.error}"));
-                }
-
-                var backdrops = snapshot.data?.backdrops ?? [];
-                if (backdrops.isEmpty) {
-                  return Center(child: Text("No images available"));
-                }
-
-                return SizedBox(
-                  height: 200,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: backdrops.length,
-                    itemBuilder: (context, index) {
-                      return ImageItem(backdrops: backdrops[index]);
+                ],
+              ),
+              SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  InkWell(
+                    onTap: (){
+                      userProvider.addToFavorites(movieId);
                     },
+                    child:
+                    infoContainer(Icon(Icons.favorite_border,color: Theme.of(context).primaryColor,), movie.voteCount,context),
                   ),
-                );
-              },
-            ),
-            sectionTitle("Similar"),
-            Container(
-              height: 300,
-              color: Colors.cyanAccent,
-            ),
-            sectionTitle("Summary"),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text(movie.overview ?? "No Overview",
-                  style: Theme.of(context).textTheme.titleSmall),
-            ),
-          ],
+                  infoContainer(Icon(Icons.timer_outlined,color: Theme.of(context).primaryColor), movie.runtimeType,context),
+                  infoContainer(Icon(Icons.star,color: Theme.of(context).primaryColor), movie.voteAverage,context),
+                ],
+              ),
+              SizedBox(height: 10),
+              sectionTitle("Screen Shots"),
+              MovieScreenshots(movieId: movieId),
+              sectionTitle("Similar"),
+              sectionTitle("Summary"),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(movie.overview ?? "No Overview",
+                    style: Theme.of(context).textTheme.titleSmall),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  infoContainer(String imagePath, String text) {
+  infoContainer(Icon Icon,  dynamic value, BuildContext context) {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 7, horizontal: 10),
       decoration: BoxDecoration(
@@ -236,9 +215,9 @@ class _DetailsScreenState extends State<DetailsScreen> {
       ),
       child: Row(
         children: [
-          Image.asset(imagePath),
+          Icon,
           SizedBox(width: 10),
-          Text(text, style: Theme.of(context).textTheme.titleSmall),
+          Text( value != null ? value.toString() : "N/A", style: Theme.of(context).textTheme.titleSmall),
         ],
       ),
     );
@@ -487,7 +466,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
 // import 'package:news/items/similar_item.dart';
 // import 'package:news/model/image_response.dart';
 // import 'package:news/model/movieSimilar_Response.dart';
-// import 'package:news/model/prowesimage_response.dart';
+// import 'package:news/model/browse_image_response.dart';
 // import 'package:news/model/sources_response.dart';
 // import 'package:news/model/upcoming_response.dart';
 //
