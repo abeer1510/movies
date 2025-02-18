@@ -3,6 +3,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:news/provider/auth_provider.dart';
+import 'package:news/screens/edit_profile.dart';
 import 'package:news/screens/forget_password.dart';
 import 'package:news/screens/login_screen.dart';
 import 'package:provider/provider.dart';
@@ -48,8 +49,7 @@ class MyApp extends StatelessWidget {
       supportedLocales: context.supportedLocales,
       locale: context.locale,
       debugShowCheckedModeBanner: false,
-      initialRoute:
-      HomeScreen.routeName,
+      initialRoute: userProvider.userName !=null ? HomeScreen.routeName:SplashScreen.routeName,
       routes: {
         SplashScreen.routeName:(context)=>SplashScreen(),
         OnBoardingScreen.routeName:(context)=>OnBoardingScreen(),
@@ -57,6 +57,7 @@ class MyApp extends StatelessWidget {
         RegisterScreen.routeName:(context)=>RegisterScreen(),
         ForgetPassword.routeName:(context)=>ForgetPassword(),
         HomeScreen.routeName:(context)=>HomeScreen(),
+        EditProfile.routeName:(context)=>EditProfile(),
 
 
       },

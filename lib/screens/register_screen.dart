@@ -9,7 +9,9 @@ import 'package:news/widgets/text_form_field.dart';
 import 'package:provider/provider.dart';
 import 'package:toggle_switch/toggle_switch.dart';
 
+import '../api_manager.dart';
 import '../firebase/firebase_manager.dart';
+import '../model/user_model.dart';
 import '../provider/auth_provider.dart';
 import 'home_screen.dart';
 import 'login_screen.dart';
@@ -38,7 +40,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   int currentIndex = 0;
 
   List<String> imgList=[
-    "assets/images/gamer1.png",
+    "assets/images/gamer0.png",
+      "assets/images/gamer1.png",
       "assets/images/gamer2.png",
       "assets/images/gamer3.png",
       "assets/images/gamer4.png",
@@ -46,8 +49,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
       "assets/images/gamer6.png",
       "assets/images/gamer7.png",
       "assets/images/gamer8.png",
-      "assets/images/gamer9.png",
-
   ];
 
   @override
@@ -225,36 +226,28 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   child: Container(
                     width: double.infinity,
                     child: ElevatedButton(
-                        onPressed: () {
+                        onPressed: () async{
                           if(formKey.currentState!.validate()){
-                            FirebaseManager.createAccount(
-                                emailController.text, passwordController.text,nameController.text,
-                                    () async {
-                                  await userProvider.initUser();
-                                  Navigator.pop(context);
-                                  Navigator.pushNamedAndRemoveUntil(context, LoginScreen.routeName, (route) => false,);
-                                },(){
-                              showDialog(context: context,
-                                builder: (context) => const AlertDialog(
-                                  backgroundColor: Colors.transparent,
-                                  title: Center(child:
-                                  CircularProgressIndicator()),
-                                ),);
-                            },(message){
-                              Navigator.pop(context);
-                              showDialog(context: context,
-                                builder: (context) => AlertDialog(
-                                  title: const Text("Something went wrong"),
-                                  content: Text(message),
-                                  actions: [
-                                    ElevatedButton(onPressed: (){Navigator.pop(context);},
-                                        child: const Text("Ok"))
-                                  ],
-                                ),);
-                            });
+                            UserModel newUser = UserModel(
+                              name: nameController.text,
+                              email: emailController.text,
+                              password:passwordController.text,
+                              confirmPassword: confirmPasswordController.text,
+                              phone: phoneController.text,
+                              avaterId: currentIndex,
+                            );
+                            Map<String, dynamic> result = await ApiManager.registerUser(newUser);
+                            print(result); // Add this line to debug and check the result
+
+                            if (result['success']) {
+                              Navigator.pushReplacementNamed(context, LoginScreen.routeName);
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text(result['message'])),
+                              );
+                            }
                           };
                         },
-
                         style: ElevatedButton.styleFrom(
                           padding: EdgeInsets.symmetric(vertical: 8),
                           shape: RoundedRectangleBorder(

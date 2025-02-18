@@ -26,9 +26,9 @@ class ProfileTab extends StatelessWidget {
                 children: [
                   Column(
                     children: [
-                      Image.asset("assets/images/gamer1.png"),
+                      Image.asset("assets/images/gamer_${userProvider.avatarId}.png"),
                       SizedBox(height: 16,),
-                      Text("${userProvider.userModel?.name}",style: Theme.of(context).textTheme.headlineSmall,),
+                      Text("${userProvider.userName}",style: Theme.of(context).textTheme.headlineSmall,),
                     ],
                   ),
                   Column(

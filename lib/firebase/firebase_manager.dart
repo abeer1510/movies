@@ -7,7 +7,7 @@ import '../model/user_model.dart';
 
 class FirebaseManager {
 
-  static createAccount(String email,String password,String name,Function onSuccess,Function onLoading, Function onError) async{
+  /*static createAccount(String email,String password,String name,Function onSuccess,Function onLoading, Function onError) async{
     try {
       onLoading();
       final credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
@@ -15,8 +15,11 @@ class FirebaseManager {
         password: password,
       );
       onSuccess();
+      print("Name passed: $name");  // Add this line to debug
+
       UserModel model=UserModel(id: credential.user!.uid, name: name, email: email, createAt: DateTime.now().millisecondsSinceEpoch);
       await addUser(model);
+      print('User added to Firestore: ${model.toJson()}');
       credential.user!.sendEmailVerification();
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
@@ -30,7 +33,7 @@ class FirebaseManager {
       onError("Something went wrong");
       print(e);
     }
-  }
+  }*/
 
   static Future<void> logIn(String email,String password,Function onSuccess,Function onLoading, Function onError) async{
     try {
@@ -55,7 +58,6 @@ class FirebaseManager {
     }
   }
 
-
   static CollectionReference <UserModel> getUsersCollection() {
     return FirebaseFirestore.instance.collection("Users").withConverter<UserModel>(
         fromFirestore: (snapshot, _) {
@@ -65,25 +67,31 @@ class FirebaseManager {
     });
   }
 
-  static Future<void> addUser(UserModel model) {
+ /* static Future<void> addUser(UserModel model) {
     var collection = getUsersCollection();
     var docRef = collection.doc(model.id);
     return docRef.set(model);
-  }
+  }*/
 
   static Future<UserModel?> getUser(String id)async{
     var collection=getUsersCollection();
     DocumentSnapshot<UserModel> snapshot = await collection.doc(id).get();
-    return snapshot.data();
+    if (snapshot.exists) {
+      print("User found: ${snapshot.data()?.name}"); // Print user name for debugging
+      return snapshot.data();
+    } else {
+      print("User with ID $id not found");
+      return null;
+    }
   }
 
-  static Future<void> updateUser(UserModel model) {
+ /* static Future<void> updateUser(UserModel model) {
     if (model.id == null ) {
       throw Exception("Document ID cannot be empty");
     }
     var collection = getUsersCollection();
     return collection.doc(model.id).update(model.toJson());
-  }
+  }*/
 
   static forgetPassword(String email)async{
     await FirebaseAuth.instance
