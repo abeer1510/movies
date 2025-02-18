@@ -9,7 +9,7 @@
   "login_with_google": "Login With Google",
   "name":"Name",
   "register":"Register",
-  "re_password":"Re Password",
+  "confirm_password":"Confirm Password",
   "have_account":"Already Have Account ? ",
   "phone_number": "Phone Number"
 }

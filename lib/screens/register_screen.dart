@@ -1,8 +1,11 @@
+import 'package:carousel_slider/carousel_options.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_icon_class/font_awesome_icon_class.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:news/widgets/text_form_field.dart';
 import 'package:provider/provider.dart';
 import 'package:toggle_switch/toggle_switch.dart';
 
@@ -11,16 +14,41 @@ import '../provider/auth_provider.dart';
 import 'home_screen.dart';
 import 'login_screen.dart';
 
-class RegisterScreen extends StatelessWidget {
+class RegisterScreen extends StatefulWidget {
   static const String routeName = 'RegisterScreen';
   RegisterScreen({super.key});
+
+  @override
+  State<RegisterScreen> createState() => _RegisterScreenState();
+}
+
+class _RegisterScreenState extends State<RegisterScreen> {
   var emailController = TextEditingController();
+
   var passwordController = TextEditingController();
+
   var nameController = TextEditingController();
-  var rePasswordController = TextEditingController();
-  var phoneNumberController = TextEditingController();
+
+  var confirmPasswordController = TextEditingController();
+
+  var phoneController = TextEditingController();
 
   var formKey=GlobalKey<FormState>();
+
+  int currentIndex = 0;
+
+  List<String> imgList=[
+    "assets/images/gamer1.png",
+      "assets/images/gamer2.png",
+      "assets/images/gamer3.png",
+      "assets/images/gamer4.png",
+      "assets/images/gamer5.png",
+      "assets/images/gamer6.png",
+      "assets/images/gamer7.png",
+      "assets/images/gamer8.png",
+      "assets/images/gamer9.png",
+
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -41,51 +69,70 @@ class RegisterScreen extends StatelessWidget {
             key: formKey,
             child: Column(
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Image(image: AssetImage('assets/images/gamer1.png')),
-                  ],
-                ),
                 Padding(
-                  padding: const EdgeInsets.only(top: 16),
-                  child: TextFormField(
-                    validator: (value) {
+                  padding: const EdgeInsets.only(top: 4.0),
+                  child: CarouselSlider.builder(
+                    itemCount: imgList.length,
+                      itemBuilder: (context, index, realIdx){
+                        bool isSelected = index == currentIndex;
+                        return Container(
+                          decoration: BoxDecoration(
+                            border: isSelected
+                                ? Border.all(color:Theme.of(context).primaryColor, width: 3)
+                                : null,
+                            borderRadius: BorderRadius.circular(50),
+                          ),
+                          child:
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(50),
+                            child: Image.asset(imgList[index]),
+                          ),
+                        );
+                      },
+                      options: CarouselOptions(
+                          height: 120,
+                          viewportFraction: 0.3,
+                          initialPage: 4,
+                          enableInfiniteScroll: false,
+                          reverse: false,
+                          autoPlay: false,
+                          enlargeCenterPage: true,
+                          enlargeFactor: 0.4,      // Make the center image significantly larger
+                          scrollDirection: Axis.horizontal,
+                          aspectRatio: 8 / 4,
+                          onPageChanged: (index,reason){
+                            setState(() {
+                              currentIndex=index;
+                            });
+                          }
+                      )
+                  ),
+                ),
+                SizedBox(height: 16,),
+                CustomTextField(
+                    icon: Icon(Icons.person,color: Colors.white,),
+                    isPasswordField: false,
+                    hasSuffix: false,
+                    keyboardType: TextInputType.text,
+                    validation: (value){
                       if (value == null || value.isEmpty) {
                         return "Name is required";
                       }
                       return null;
                     },
-                    onChanged:(value) {
+                    onChange: (){
                       formKey.currentState!.validate();
+
                     },
                     controller: nameController,
-                    style: Theme.of(context)
-                        .textTheme
-                        .titleSmall,
-                    decoration: InputDecoration(
-                      fillColor: Color(0xff282A28),
-                      filled: true,
-                      labelText: "name".tr(),
-                      prefixIcon: ImageIcon(AssetImage("assets/images/person.png"),color: Colors.white,),
-                      labelStyle: Theme.of(context).textTheme.titleSmall,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(16),
-
-                      ),
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 16),
-                  child: TextFormField(
-                    validator: (value) {
+                    text: "name".tr()),
+                SizedBox(height: 16,),
+                CustomTextField(
+                    icon: Icon(Icons.email,color: Colors.white,),
+                    isPasswordField: false,
+                    hasSuffix: false,
+                    keyboardType: TextInputType.emailAddress,
+                    validation: (value){
                       if (value == null || value.isEmpty) {
                         return "Email is required";
                       }
@@ -98,181 +145,81 @@ class RegisterScreen extends StatelessWidget {
                       }
                       return null;
                     },
-                    onChanged:(value) {
+                    onChange: (){
                       formKey.currentState!.validate();
+
                     },
                     controller: emailController,
-                    style: Theme.of(context)
-                        .textTheme
-                        .titleSmall,
-                    decoration: InputDecoration(
-                      fillColor: Color(0xff282A28),
-                      filled: true,
-                      labelText: 'email'.tr(),
-                      prefixIcon: Icon(
-                        Icons.email,
-                        color: Colors.white,
-                      ),
-                      labelStyle: Theme.of(context).textTheme.titleSmall,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(16),
-
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(16),
-
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(16),
-
-                      ),
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 16),
-                  child: TextFormField(
-                    validator: (value) {
+                    text: "email".tr()),
+                SizedBox(height: 16,),
+                CustomTextField(
+                    icon: Icon(Icons.lock,color: Colors.white,),
+                    isPasswordField: true,
+                    hasSuffix: true,
+                    keyboardType: TextInputType.text,
+                    validation: (value){
                       if (value == null || value.isEmpty) {
                         return "Password is required";
-                      } else if (value.length < 6) {
-                        return "Password must be more than 6 digits";
+                      }String pattern =
+                          r'^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[?!.@#$%^&*()_+])[A-Za-z\d?!.@#$%^&*()_+]{8,}$';
+                      RegExp regExp = RegExp(pattern);
+                      if (!regExp.hasMatch(value)) {
+                        return 'Password must be at least 8 characters long, with 1 uppercase, 1 lowercase, 1 number, and 1 special character';
                       }
                       return null;
                     },
-                    onChanged:(value) {
+                    onChange: (){
                       formKey.currentState!.validate();
                     },
                     controller: passwordController,
-                    obscureText: true,
-                    style: Theme.of(context)
-                        .textTheme
-                        .titleSmall,
-                    decoration: InputDecoration(
-                      fillColor: Color(0xff282A28),
-                      filled: true,
-                      labelText: 'password'.tr(),
-                      prefixIcon: Icon(
-                        Icons.lock,
-                        color: Colors.white,
-                      ),
-                      suffixIcon: Icon(
-                        Icons.visibility_off,
-                        color: Colors.white,
-                      ),
-                      labelStyle: Theme.of(context).textTheme.titleSmall,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(16),
-
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(16),
-
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(16),
-
-                      ),
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 16),
-                  child: TextFormField(
-                    validator: (value) {
+                    text: "password".tr()),
+                SizedBox(height: 16,),
+                CustomTextField(
+                    icon: Icon(Icons.lock,color: Colors.white,),
+                    isPasswordField: true,
+                    hasSuffix: true,
+                    keyboardType: TextInputType.text,
+                    validation: (value){
                       if (value == null || value.isEmpty) {
-                        return "Repassword is required";
-                      } else if (value.length < 6) {
-                        return "Password must be more than 6 digits";
+                        return "Re password is required";
+                      } String pattern =
+                          r'^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[?!.@#$%^&*()_+])[A-Za-z\d?!.@#$%^&*()_+]{8,}$';
+                      RegExp regExp = RegExp(pattern);
+                      if (!regExp.hasMatch(value)) {
+                        return 'Password must be at least 8 characters long, with 1 uppercase, 1 lowercase, 1 number, and 1 special character';
                       }
                       else if(passwordController.text!=value){
                         return "Password don't match";
                       }
                       return null;
                     },
-                    onChanged:(value) {
+                    onChange: (){
                       formKey.currentState!.validate();
                     },
-                    controller: rePasswordController,
-                    obscureText: true,
-                    style: Theme.of(context)
-                        .textTheme
-                        .titleSmall,
-                    decoration: InputDecoration(
-                      fillColor: Color(0xff282A28),
-                      filled: true,
-                      labelText:"re_password".tr(),
-                      prefixIcon: Icon(
-                        Icons.lock,
-                        color: Colors.white,
-                      ),
-                      suffixIcon: Icon(
-                        Icons.visibility_off,
-                        color: Colors.white,
-                      ),
-                      labelStyle: Theme.of(context).textTheme.titleSmall,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(16),
-
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(16),
-
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(16),
-
-                      ),
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 16),
-                  child: TextFormField(
-                    validator: (value) {
+                    controller: confirmPasswordController,
+                    text: "confirm_password".tr()),
+                SizedBox(height: 16,),
+                CustomTextField(
+                    icon: Icon(Icons.call,color: Colors.white,),
+                    isPasswordField: false,
+                    hasSuffix: false,
+                    keyboardType: TextInputType.phone,
+                    validation: (value){
                       if (value == null || value.isEmpty) {
                         return "phone is required";
                       }
-                      else if(!RegExp(r'^[0-9]{10}$').hasMatch(value)) {
-                        return 'Enter a valid 10-digit phone number';
-                      }
+                      String pattern = r'^\+20\d{10}$';
+                      RegExp regExp = RegExp(pattern);
+                      if (!regExp.hasMatch(value)) {
+                        return 'Please enter a valid phone number (e.g., +201141209334)';}
                       return null;
                     },
-                    onChanged:(value) {
+                    onChange: (){
                       formKey.currentState!.validate();
+
                     },
-                    controller: phoneNumberController,
-                    style: Theme.of(context)
-                        .textTheme
-                        .titleSmall,
-                    decoration: InputDecoration(
-                      fillColor: Color(0xff282A28),
-                      filled: true,
-                      labelText:"phone_number".tr(),
-                      prefixIcon: Icon(
-                        Icons.call,
-                        color: Colors.white,
-                      ),
-
-                      labelStyle: Theme.of(context).textTheme.titleSmall,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(16),
-
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(16),
-
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(16),
-
-                      ),
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  height: 16,
-                ),
+                    controller: phoneController,
+                    text: "phone_number".tr()),
                 Padding(
                   padding: const EdgeInsets.only(top: 14, bottom: 24),
                   child: Container(
@@ -345,39 +292,31 @@ class RegisterScreen extends StatelessWidget {
                   height: 24,
                 ),
                 ToggleSwitch(
-                  minWidth: 60.0,
-                  minHeight: 30.0,
-                  initialLabelIndex: context.locale.toString() == "en" ? 0 : 1,
-                  cornerRadius: 20.0,
-                  activeFgColor: Colors.white,
-                  inactiveBgColor: Colors.grey,
-                  inactiveFgColor: Colors.white,
+                  minWidth: 50,
+                  initialLabelIndex: context.locale.toString()=="en"?0:1,
+                  cornerRadius: 40.0,
+                  inactiveBgColor: Theme.of(context).hintColor,
                   totalSwitches: 2,
-                  icons: [
-                    FontAwesomeIcons.flagUsa,
-                    MdiIcons.abjadArabic,
+                  activeBgColor: [Theme.of(context).primaryColor],
+                  activeBorders: [
+                    Border.all(
+                      color: Theme.of(context).primaryColor,
+                      width: 3.0,
+                    ),
                   ],
-                  iconSize: 30.0,
-                  activeBgColors: [
-                    [
-                      Theme.of(context).primaryColor,
-                      Theme.of(context).secondaryHeaderColor
-                    ],
-                    [Colors.yellow, Colors.orange]
-                  ],
-                  animate:
-                  true, // with just animate set to true, default curve = Curves.easeIn
-                  curve: Curves
-                      .bounceInOut, // animate must be set to true when using custom curve
+                  labels: const ["english","arabic"],
+                  radiusStyle: true,
+                  customWidgets: [
+                    Image.asset("assets/images/english.png"), Image.asset("assets/images/arabic.png")],
                   onToggle: (index) {
-                    if (index == 1) {
-                      context.setLocale(Locale('ar'));
-                    } else {
-                      context.setLocale(Locale('en'));
+                    if(index==1){
+                      context.setLocale(const Locale('ar'));
+                    }else{
+                      context.setLocale(const Locale('en'));
                     }
                     print('switched to: $index');
                   },
-                ),
+                )
               ],
             ),
           ),

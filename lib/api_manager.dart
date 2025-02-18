@@ -19,6 +19,18 @@ class ApiManager{
     return sourcesResponse;
   }
 
+  // ApiService class
+
+  static Future<SourcesResponse> getPopularByName(String name)async{
+    Uri url=Uri.parse("https://api.themoviedb.org/3/search/movie?api_key=2b0d978a962d720636b46566d80b8e37&query=$name");
+    final response = await http.get(url);
+    if (response.statusCode == 200) {
+      return SourcesResponse.fromJson(json.decode(response.body));
+
+    } else {
+      throw Exception('Failed to load movies');
+    }
+  }
 
   static Future<UpcomingResponse> getupComing()async{
     Uri url=Uri.parse("https://api.themoviedb.org/3/movie/upcoming?api_key=1af5751239f6c52b196a77e23dcf8416");

@@ -55,6 +55,7 @@ class FirebaseManager {
     }
   }
 
+
   static CollectionReference <UserModel> getUsersCollection() {
     return FirebaseFirestore.instance.collection("Users").withConverter<UserModel>(
         fromFirestore: (snapshot, _) {
@@ -63,6 +64,7 @@ class FirebaseManager {
       return value.toJson();
     });
   }
+
   static Future<void> addUser(UserModel model) {
     var collection = getUsersCollection();
     var docRef = collection.doc(model.id);
@@ -73,6 +75,23 @@ class FirebaseManager {
     var collection=getUsersCollection();
     DocumentSnapshot<UserModel> snapshot = await collection.doc(id).get();
     return snapshot.data();
+  }
+
+  static Future<void> updateUser(UserModel model) {
+    if (model.id == null ) {
+      throw Exception("Document ID cannot be empty");
+    }
+    var collection = getUsersCollection();
+    return collection.doc(model.id).update(model.toJson());
+  }
+
+  static forgetPassword(String email)async{
+    await FirebaseAuth.instance
+        .sendPasswordResetEmail(email: email);FirebaseAuth.instance.sendPasswordResetEmail(email: email).then((value) {
+      print("Password reset email sent.");
+    }).catchError((e) {
+      print("Error: $e");
+    });
   }
 
   static Future<UserCredential> signInWithGoogle() async {

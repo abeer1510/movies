@@ -9,7 +9,7 @@
   "login_with_google": "تسجيل الدخول باستخدام جوجل",
   "name": "الاسم",
   "register": "تسجيل",
-  "re_password": "إعادة كلمة المرور",
+  "confirm_password": "تأكيد كلمة المرور",
   "have_account": "هل لديك حساب بالفعل؟ ",
   "phone_number": "رقم الهاتف"
 

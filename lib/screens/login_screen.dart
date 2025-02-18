@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:toggle_switch/toggle_switch.dart';
 
 import '../provider/auth_provider.dart';
+import '../widgets/text_form_field.dart';
 import 'forget_password.dart';
 import 'home_screen.dart';
 import 'register_screen.dart';
@@ -25,115 +26,67 @@ class _LoginScreenState extends State<LoginScreen> {
 
   var passwordController = TextEditingController();
 
-  bool _obscureText = true; // This controls whether the password is visible
-
   var formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
     var userProvider = Provider.of<UserProvider>(context);
     return Scaffold(
-      appBar: AppBar(
-        toolbarHeight: 5,
-      ),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
+        padding: const EdgeInsets.only(left: 16,right:16,bottom: 4),
         child: SingleChildScrollView(
           child: Form(
             key: formKey,
             child: Column(
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Image(image: AssetImage('assets/images/splash.png')),
-                  ],
-                ),
-                TextFormField(
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return "Email is required";
-                    }
-                    return null;
-                  },
-                  onChanged:(value) {
-                    formKey.currentState!.validate();
-                  },
-                  controller: emailController,
-                  style: Theme.of(context).textTheme.titleSmall,
-                  decoration: InputDecoration(
-                    fillColor: Color(0xff282A28),
-                    filled: true,
-                    labelText: 'email'.tr(),
-                    prefixIcon: Icon(Icons.email, color: Colors.white,),
-                    labelStyle: Theme.of(context).textTheme.titleSmall,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 16),
-                  child: TextFormField(
-                    validator: (value) {
+                const Image(image: AssetImage('assets/images/splash.png')),
+                CustomTextField(
+                    icon: const Icon(Icons.email,color: Colors.white,),
+                    isPasswordField: false,
+                    hasSuffix: false,
+                    keyboardType: TextInputType.emailAddress,
+                    validation: (value){
                       if (value == null || value.isEmpty) {
-                        return "Password is required";
+                        return "Email is required";
+                      }
+                      final bool emailValid = RegExp(
+                          r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                          .hasMatch(value);
+
+                      if (!emailValid) {
+                        return "Email not valid";
                       }
                       return null;
                     },
-                    onChanged: (value) {
+                    onChange: (){
+                      formKey.currentState!.validate();
+
+                    },
+                    controller: emailController,
+                    text: "email".tr()),
+                const SizedBox(height: 16,),
+                CustomTextField(
+                    icon: const Icon(Icons.lock,color: Colors.white,),
+                    isPasswordField: true,
+                    hasSuffix: true,
+                    keyboardType: TextInputType.text,
+                    validation: (value){
+                      if (value == null || value.isEmpty) {
+                        return "Password is required";
+                      }String pattern =
+                          r'^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[?!.@#$%^&*()_+])[A-Za-z\d?!.@#$%^&*()_+]{8,}$';
+                      RegExp regExp = RegExp(pattern);
+                      if (!regExp.hasMatch(value)) {
+                        return 'Password must be at least 8 characters long, with 1 uppercase, 1 lowercase, 1 number, and 1 special character';
+                      }
+                      return null;
+                    },
+                    onChange: (){
                       formKey.currentState!.validate();
                     },
                     controller: passwordController,
-                    obscureText: _obscureText,
-                    style: Theme.of(context)
-                        .textTheme
-                        .titleSmall!,
-                    decoration: InputDecoration(
-                      fillColor: Color(0xff282A28),
-                      filled: true,
-                      labelText: 'password'.tr(),
-                      prefixIcon: Icon(
-                        Icons.lock,
-                        color: Colors.white,
-                      ),
-                      suffixIcon: InkWell(
-                        onTap: (){
-                          setState(() {
-                            _obscureText = !_obscureText; // Toggle password visibility
-
-                          });
-
-                        },
-                        child: Icon(
-                          _obscureText ? Icons.visibility_off : Icons.visibility,
-                          color: Colors.white,
-                        ),
-                      ),
-                      labelStyle: Theme.of(context).textTheme.titleSmall,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(16),
-
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(16),
-
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(16),
-
-                      ),
-                    ),
-                  ),
-                ),
-                SizedBox(
+                    text: "password".tr()),
+                const SizedBox(
                   height: 16,
                 ),
                 Row(
@@ -159,44 +112,47 @@ class _LoginScreenState extends State<LoginScreen> {
                     width: double.infinity,
                     child: ElevatedButton(
                         onPressed: () {
-                          FirebaseManager.logIn(
-                              emailController.text, passwordController.text, () async{
-                            await userProvider.initUser();
-                            Navigator.pop(context);
-                            Navigator.pushNamedAndRemoveUntil(
-                              context,
-                              HomeScreen.routeName,
-                                  (route) => false,
-                            );
-                          }, () {
-                            showDialog(
-                              context: context,
-                              builder: (context) => const AlertDialog(
-                                backgroundColor: Colors.transparent,
-                                title: Center(child: CircularProgressIndicator()),
-                              ),
-                            );
-                          }, (message) {
-                            Navigator.pop(context);
-                            showDialog(
-                              context: context,
-                              builder: (context) => AlertDialog(
-                                title: const Text("Something went wrong"),
-                                content: Text(message),
-                                actions: [
-                                  ElevatedButton(
-                                      onPressed: () {
-                                        Navigator.pop(context);
-                                      },
-                                      child: const Text("Ok"))
-                                ],
-                              ),
-                            );
-                          });
+                          if(formKey.currentState!.validate()){
+                            FirebaseManager.logIn(
+                                emailController.text, passwordController.text, () async{
+                              await userProvider.initUser();
+                              Navigator.pop(context);
+                              Navigator.pushNamedAndRemoveUntil(
+                                context,
+                                HomeScreen.routeName,
+                                    (route) => false,
+                              );
+                            }, () {
+                              showDialog(
+                                context: context,
+                                builder: (context) => const AlertDialog(
+                                  backgroundColor: Colors.transparent,
+                                  title: Center(child: CircularProgressIndicator()),
+                                ),
+                              );
+                            }, (message) {
+                              Navigator.pop(context);
+                              showDialog(
+                                context: context,
+                                builder: (context) => AlertDialog(
+                                  title: const Text("Something went wrong"),
+                                  content: Text(message),
+                                  actions: [
+                                    ElevatedButton(
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                        },
+                                        child: const Text("Ok"))
+                                  ],
+                                ),
+                              );
+                            });
+
+                          }
                         },
 
                         style: ElevatedButton.styleFrom(
-                          padding: EdgeInsets.symmetric(vertical: 8),
+                          padding: const EdgeInsets.symmetric(vertical: 8),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -212,7 +168,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               style: GoogleFonts.inter(
                                 fontSize: 20,
                                 fontWeight: FontWeight.w500,
-                                color: Color(0xff282A28),
+                                color: const Color(0xff282A28),
                               )),
                         )),
                   ),
@@ -220,7 +176,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 GestureDetector(
                   onTap: (){
                     Navigator.pushNamed(context, RegisterScreen.routeName);
-
                   },
                   child: Text.rich(
                       textAlign: TextAlign.center,
@@ -238,7 +193,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ],
                       )),
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 24,
                 ),
                 Row(
@@ -268,7 +223,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     )
                   ],
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 24,
                 ),
                 ElevatedButton(
@@ -276,7 +231,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       FirebaseManager.signInWithGoogle;
                     },
                     style: ElevatedButton.styleFrom(
-                      padding: EdgeInsets.symmetric(vertical: 14),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
                       side: BorderSide(color: Theme.of(context).primaryColor),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -286,49 +241,45 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        ImageIcon(AssetImage('assets/images/google.png'),color: Color(0xff202020),),
-                        SizedBox(
+                        const ImageIcon(AssetImage('assets/images/google.png'),color: Color(0xff202020),),
+                        const SizedBox(
                           width: 6,
                         ),
                         Text('login_with_google'.tr(),
                             style: GoogleFonts.inter(
                               fontSize: 16,
                               fontWeight: FontWeight.w500,
-                              color: Color(0xff282A28),
+                              color: const Color(0xff282A28),
                             )),
                       ],
                     )),
-                SizedBox(height: 24,),
+                const SizedBox(height: 24,),
                 ToggleSwitch(
-                  minWidth: 60.0,
-                  minHeight: 30.0,
+                  minWidth: 50,
                   initialLabelIndex: context.locale.toString()=="en"?0:1,
-                  cornerRadius: 20.0,
-                  activeFgColor: Colors.white,
-                  inactiveBgColor: Colors.grey,
-                  inactiveFgColor: Colors.white,
+                  cornerRadius: 40.0,
+                  inactiveBgColor: Theme.of(context).hintColor,
                   totalSwitches: 2,
-                  icons:  [
-                    FontAwesomeIcons.flagUsa,
-                    MdiIcons.abjadArabic,
+                  activeBgColor: [Theme.of(context).primaryColor],
+                  activeBorders: [
+                    Border.all(
+                      color: Theme.of(context).primaryColor,
+                      width: 3.0,
+                    ),
                   ],
-                  iconSize: 30.0,
-                  activeBgColors: [[Theme.of(context).primaryColor, Theme.of(context).secondaryHeaderColor],
-                    [Colors.yellow, Colors.orange]],
-                  animate: true, // with just animate set to true, default curve = Curves.easeIn
-                  curve: Curves.bounceInOut, // animate must be set to true when using custom curve
+                  labels: const ["english","arabic"],
+                  radiusStyle: true,
+                  customWidgets: [
+                    Image.asset("assets/images/english.png"), Image.asset("assets/images/arabic.png")],
                   onToggle: (index) {
                     if(index==1){
-                      context.setLocale(Locale('ar'));
-                    }
-                    else{
-                      context.setLocale(Locale('en'));
-
+                      context.setLocale(const Locale('ar'));
+                    }else{
+                      context.setLocale(const Locale('en'));
                     }
                     print('switched to: $index');
                   },
-                ),
-              ],
+                )              ],
             ),
           ),
         ),

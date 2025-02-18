@@ -21,14 +21,14 @@ class HomeTab extends StatelessWidget {
             children: [
               Stack(
                 children: [
-                  Image(image: AssetImage("assets/images/onboarding6.png"),),
+                  const Image(image: AssetImage("assets/images/movie_poster.jpg"),),
                   Column(
                     children: [
-                      Image(image: AssetImage("assets/images/available.png")),
+                      const Image(image: AssetImage("assets/images/available.png")),
                       FutureBuilder<SourcesResponse>(future: ApiManager.getPopular(),
                           builder: (context,snapshot){
                             if(snapshot.connectionState == ConnectionState.waiting){
-                              return Center(child: CircularProgressIndicator());
+                              return const Center(child: CircularProgressIndicator());
                             }
                             if(snapshot.hasError){
                               return Center(child: Text("Something Went Wrong",style: Theme.of(context).textTheme.titleLarge,));
@@ -50,7 +50,7 @@ class HomeTab extends StatelessWidget {
                                     viewportFraction: 0.55,
                                     aspectRatio: 16 / 9,
                                   ),),
-                                Image(image: AssetImage("assets/images/watch.png")),
+                                const Image(image: AssetImage("assets/images/watch.png")),
                               ],);
                           }),
                       Padding(
@@ -75,7 +75,7 @@ class HomeTab extends StatelessWidget {
                           child: ListView.separated(scrollDirection: Axis.horizontal,
                             itemBuilder: (context,index){
                               if(snapshot.connectionState == ConnectionState.waiting){
-                                return Center(child: CircularProgressIndicator());
+                                return const Center(child: CircularProgressIndicator());
                               }
                               if(snapshot.hasError){
                                 return Center(child: Text("Something Went Wrong",style: Theme.of(context).textTheme.titleLarge,));
@@ -83,10 +83,9 @@ class HomeTab extends StatelessWidget {
                               var data = snapshot.data?.results??[];
                               return UpcomingItem(results: snapshot.data!.results![index]) ;
                             },itemCount:snapshot.data?.results?.length??0,
-                            separatorBuilder: (context,index)=>SizedBox(width: 10,),),
+                            separatorBuilder: (context,index)=>const SizedBox(width: 10,),),
                         );
-                      }),
-                    ],
+                      }),                    ],
                   ),
                 ],
               ),

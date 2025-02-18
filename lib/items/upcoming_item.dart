@@ -19,7 +19,12 @@ class UpcomingItem extends StatelessWidget {
               children: [
                 GestureDetector(
 
+                    onTap: (){
+                      Navigator.pushNamed(
+                        context, DetailsScreen.routName,
+                      );                  },
                     child: Image.network("https://image.tmdb.org/t/p/w500${results.posterPath}"??"",fit: BoxFit.fill,height: 220,width: 150,)),
+
                 Padding(
                   padding: const EdgeInsets.only(top: 13,left: 14),
                   child: Container(
