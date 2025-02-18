@@ -3,10 +3,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:news/model/sources_response.dart';
 import 'package:news/model/upcoming_response.dart';
+
 import 'package:news/screens/details_screen.dart';
 
 class UpcomingItem extends StatelessWidget {
-  Results results;
+  Results1 results;
   UpcomingItem({super.key,required this.results});
   @override
   Widget build(BuildContext context) {
@@ -16,8 +17,8 @@ class UpcomingItem extends StatelessWidget {
             borderRadius: BorderRadius.circular(20),
             child: Stack(
               children: [
-
                 GestureDetector(
+
                     onTap: (){
                       Navigator.pushNamed(
                         context, DetailsScreen.routName,
@@ -27,11 +28,11 @@ class UpcomingItem extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.only(top: 13,left: 14),
                   child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 7),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: Color(0xB5121312),
-                      ),
+                    padding: EdgeInsets.symmetric(horizontal: 7),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: Color(0xB5121312),
+                    ),
                       child: Row(
                         children: [
                           Text("${results.voteAverage}",style: Theme.of(context).textTheme.titleSmall),
