@@ -4,7 +4,8 @@ class CustomButton extends StatelessWidget {
   String text;
   Color color;
   Color textColor;
-   CustomButton({super.key,required this.text,required this.color,required this.textColor});
+  Function onTab;
+   CustomButton({super.key,required this.text,required this.color,required this.textColor,required this.onTab});
 
   @override
   Widget build(BuildContext context) {
@@ -12,6 +13,7 @@ class CustomButton extends StatelessWidget {
         width: double.infinity,
         child: ElevatedButton(
             onPressed: () async{
+              onTab();
             },
             style: ElevatedButton.styleFrom(
               padding: EdgeInsets.symmetric(vertical: 8),

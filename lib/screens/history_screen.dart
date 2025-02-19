@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:news/api_manager.dart';
 import 'package:news/items/movie_item.dart';
@@ -7,10 +9,17 @@ import '../model/poplar_movie_model.dart';
 import '../provider/auth_provider.dart';
 import 'details_screen.dart';
 
-class HistoryScreen extends StatelessWidget {
+class HistoryScreen extends StatefulWidget {
   static const String routName = "HistoryScreen";
    HistoryScreen({super.key});
-  final Map<int, Future<Results?>> _movieCache = {}; // Cache movie details
+
+  @override
+  State<HistoryScreen> createState() => _HistoryScreenState();
+}
+
+class _HistoryScreenState extends State<HistoryScreen> {
+  final Map<int, Future<Results?>> _movieCache = {};
+  late Future<List<int>> _favoritesFuture;
 
   Future<Results?> getMovieDetails(int movieId) {
     if (!_movieCache.containsKey(movieId)) {
@@ -18,6 +27,46 @@ class HistoryScreen extends StatelessWidget {
     }
     return _movieCache[movieId]!;
   }
+
+  @override
+  void initState() {
+    super.initState();
+    _favoritesFuture = getAllFavoritesIds();
+  }
+
+  Future<List<int>> getAllFavoritesIds() async {
+    var userProvider = Provider.of<UserProvider>(context, listen: false);
+
+    try {
+      List<dynamic> favorites = await userProvider.getAllFavorites();
+
+      debugPrint("📥 Favorites Response: $favorites");
+
+      if (favorites.isEmpty) {
+        debugPrint("⚠️ No favorite movies found.");
+        return [];
+      }
+
+      return favorites.map<int>((movie) {
+        if (movie.containsKey('movieId')) {
+          try {
+            return int.parse(movie['movieId'].toString()); // ✅ Convert to int safely
+          } catch (e) {
+            debugPrint("⚠️ Invalid movie ID format: ${movie['movieId']}");
+            return -1; // Default invalid ID
+          }
+        } else {
+          debugPrint("⚠️ Invalid movie format: $movie");
+          return -1; // Default invalid ID
+        }
+      }).where((id) => id != -1).toList(); // Filter out invalid IDs
+
+    } catch (e) {
+      debugPrint("❌ Error fetching favorites: $e");
+      return [];
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -65,8 +114,21 @@ class HistoryScreen extends StatelessWidget {
             Expanded(
               child: TabBarView(
                 children: [
-                  _buildGridView(userProvider.favorites),
+                  FutureBuilder<List<int>>(
+                    future: _favoritesFuture,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(child: CircularProgressIndicator());
+                      } else if (snapshot.hasError || snapshot.data == null) {
+                        return Center(child: Text("Failed to load favorites"));
+                      } else {
+                        List<dynamic> favorites = snapshot.data!;
+                        return _buildGridView(snapshot.data!);
+                      }
+                    },
+                  ),
                   _buildGridView(userProvider.history),
+
                 ],
               ),
             ),
@@ -75,6 +137,7 @@ class HistoryScreen extends StatelessWidget {
       ),
     );
   }
+
   Widget _buildGridView(List<int> movieIds) {
     return GridView.builder(
       padding: EdgeInsets.all(8),
@@ -87,7 +150,6 @@ class HistoryScreen extends StatelessWidget {
       itemCount: movieIds.length,
       itemBuilder: (context, index) {
         int movieId = movieIds[index];
-
         return FutureBuilder<Results?>(
           future: getMovieDetails(movieId), // Using the cached Future
           builder: (context, snapshot) {

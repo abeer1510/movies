@@ -21,7 +21,6 @@ class _SplashScreenState extends State<SplashScreen> {
     _checkUserStatus();
   }
   Future<void> _checkUserStatus() async {
-    await Future.delayed(Duration(seconds: 3)); // Simulate loading
 
     bool onboardingCompleted = CacheHelper.getEligibility() ?? false;
     var userProvider = Provider.of<UserProvider>(context, listen: false);

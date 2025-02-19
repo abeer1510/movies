@@ -20,13 +20,41 @@ class DetailsScreen extends StatefulWidget {
 
 class _DetailsScreenState extends State<DetailsScreen> {
   late Future<MovieDetailsResponse> movieDetailsFuture;
+  late bool isFavorite=false;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      checkIfFavorite();
+    });
     movieDetailsFuture = ApiManager.getDetails(widget.movieId);
   }
+  Future<void> checkIfFavorite() async {
+    var userProvider = Provider.of<UserProvider>(context, listen: false);
+    bool exists = await userProvider.isFavorite(widget.movieId);
+    setState(() {
+      isFavorite = exists;
+    });
+  }
+  Future<void> toggleFavorite(MovieDetailsResponse movie) async {
+    var userProvider = Provider.of<UserProvider>(context, listen: false);
 
+    if (isFavorite) {
+      await userProvider.removeFromFavorites(widget.movieId);
+    } else {
+      await userProvider.addToFavorites(
+        movieId: widget.movieId,
+        name: movie.title ?? "No Title",
+        rating: movie.voteAverage ?? 0.0,
+        imageURL: movie.posterPath ?? "",
+        year: movie.releaseDate?.substring(0, 4) ?? "Unknown",
+      );
+    }
+    setState(() {
+      isFavorite = !isFavorite;
+    });
+  }
   @override
   Widget build(BuildContext context) {
     final movieId = widget.movieId;
@@ -85,11 +113,17 @@ class _DetailsScreenState extends State<DetailsScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
                           InkWell(
+
                             onTap: (){
-                              userProvider.addToFavorites(movieId);
+                              toggleFavorite(movie);
+                             /* userProvider.addToFavorites(movieId: movieId,name: movie.title??"No Title",
+                              rating: movie.voteAverage??0,imageURL: movie.posterPath??"",
+                                  year: movie.releaseDate != null && movie.releaseDate!.length >= 4
+                                      ? movie.releaseDate!.substring(0, 4)
+                                      : "No Date");*/
                             },
                             child:
-                            infoContainer(Icon(Icons.favorite_border,color: Theme.of(context).primaryColor,), movie.voteCount,context),
+                            infoContainer(isFavorite==true?Icon(Icons.favorite,color: Theme.of(context).primaryColor,):Icon(Icons.favorite_border,color: Theme.of(context).primaryColor,), movie.voteCount,context),
                           ),
                           infoContainer(Icon(Icons.timer_outlined,color: Theme.of(context).primaryColor), movie.runtime,context),
                           infoContainer(Icon(Icons.star,color: Theme.of(context).primaryColor), movie.voteAverage,context),

@@ -36,7 +36,7 @@ class ProfileTab extends StatelessWidget {
                     ),
                     Column(
                       children: [
-                        Text("${userProvider.favorites.length}",style: Theme.of(context).textTheme.headlineLarge,),
+                        Text("${userProvider.favoriteMoviesCount}",style: Theme.of(context).textTheme.headlineLarge,),
                         SizedBox(height: 16,),
                         Text("Wish List",style: Theme.of(context).textTheme.headlineMedium,),
                       ],
