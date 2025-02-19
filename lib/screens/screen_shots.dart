@@ -66,6 +66,7 @@ class _MovieScreenshotsState extends State<MovieScreenshots> {
       height: 200, 
       child:ListView.separated(
           scrollDirection: Axis.horizontal,
+          shrinkWrap: true,
           itemBuilder: (context,index){
         return Padding(
           padding: const EdgeInsets.all(8.0),

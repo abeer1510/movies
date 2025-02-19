@@ -102,11 +102,16 @@ class _SearchTabState extends State<SearchTab> {
                }
                var movies = snapshot.data?.results??[];
                return Expanded(
-                 child: ListView.builder(itemBuilder: (context,index){
+                 child: GridView.builder(gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                   crossAxisCount: 2, // Number of columns
+                   childAspectRatio: 0.6, // Adjust height to width ratio
+                   crossAxisSpacing: 10,
+                   mainAxisSpacing: 10,
+                 ),itemCount: movies.length,
+                 itemBuilder: (context,index){
                    return MovieItem(movieId:movies[index].id??0 ,voteAverage: movies[index].voteAverage??0,movieImage: movies[index].posterPath??"",);
 
-                 },
-                 itemCount: movies.length,),
+                 },)
                );
              })
         ],
