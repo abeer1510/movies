@@ -1,10 +1,11 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:news/model/sources_response.dart';
 import 'package:news/model/upcoming_response.dart';
 
 import 'package:news/screens/details_screen.dart';
+
+import '../model/poplar_movie_model.dart';
 
 class UpcomingItem extends StatelessWidget {
   Results results;

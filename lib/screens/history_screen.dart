@@ -3,7 +3,7 @@ import 'package:news/api_manager.dart';
 import 'package:news/items/movie_item.dart';
 import 'package:provider/provider.dart';
 
-import '../model/sources_response.dart';
+import '../model/poplar_movie_model.dart';
 import '../provider/auth_provider.dart';
 import 'details_screen.dart';
 
@@ -105,7 +105,7 @@ class HistoryScreen extends StatelessWidget {
                       MaterialPageRoute(
                         builder: (context) =>
                             DetailsScreen(
-                              movieId: movieId,movie: snapshot.data!,
+                              movieId: movieId,
                             ),
                       ),
                     );

@@ -1,30 +1,29 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
-import 'package:news/model/sources_response.dart';
-
 import 'model/browse_image_response.dart';
 import 'model/browse_list_response.dart';
 import 'model/image_response.dart';
 import 'model/movie_details_response.dart';
+import 'model/poplar_movie_model.dart';
 import 'model/upcoming_response.dart';
 import 'model/user_model.dart';
 
 class ApiManager{
-  static Future<SourcesResponse> getPopular()async{
+  static Future<PoplarMovieModel> getPopular()async{
     Uri url=Uri.parse("https://api.themoviedb.org/3/tv/popular?api_key=1af5751239f6c52b196a77e23dcf8416");
 
     http.Response response = await http.get(url);
     var json =jsonDecode(response.body);
-    SourcesResponse sourcesResponse=SourcesResponse.fromJson(json);
+    PoplarMovieModel sourcesResponse=PoplarMovieModel.fromJson(json);
     return sourcesResponse;
   }
 
-  static Future<SourcesResponse> getPopularByName(String name)async{
+  static Future<PoplarMovieModel> getPopularByName(String name)async{
     Uri url=Uri.parse("https://api.themoviedb.org/3/search/movie?api_key=2b0d978a962d720636b46566d80b8e37&query=$name");
     final response = await http.get(url);
     if (response.statusCode == 200) {
-      return SourcesResponse.fromJson(json.decode(response.body));
+      return PoplarMovieModel.fromJson(json.decode(response.body));
 
     } else {
       throw Exception('Failed to load movies');
@@ -74,16 +73,32 @@ class ApiManager{
   }
 
   static Future<MovieDetailsResponse> getDetails(int movieId) async {
-    final Uri url = Uri.parse("https://api.themoviedb.org/3/movie/$movieId?key=1af5751239f6c52b196a77e23dcf8416");
+    final Uri url = Uri.parse("https://api.themoviedb.org/3/movie/$movieId?api_key=2b0d978a962d720636b46566d80b8e37");
 
     http.Response response = await http.get(url);
-    var json =jsonDecode(response.body);
-    MovieDetailsResponse movieDetailsResponse=MovieDetailsResponse.fromJson(json);
-    return movieDetailsResponse;
+    print("Movie Details API Response: ${response.body}");
+    if (response.statusCode == 200) {
+      return MovieDetailsResponse.fromJson(json.decode(response.body));
+    } else {
+      throw Exception("Failed to load movie details");
+    }
 
   }
 
-  static Future<void> updateMoviesWithPosters(SourcesResponse? sourcesResponse) async {
+  static Future<PoplarMovieModel> getMovies() async {
+    Uri url = Uri.parse(
+        "https://api.themoviedb.org/3/movie/popular?api_key=2b0d978a962d720636b46566d80b8e37");
+    http.Response response = await http.get(url);
+    if (response.statusCode == 200) {
+      var json = jsonDecode(response.body);
+      PoplarMovieModel moviesList = PoplarMovieModel.fromJson(json);
+      return moviesList;
+    } else {
+      throw Exception("Failed to load movies");
+    }
+  }
+
+  static Future<void> updateMoviesWithPosters(PoplarMovieModel? sourcesResponse) async {
     if (sourcesResponse == null || sourcesResponse.results == null) return;
 
     for (var result in sourcesResponse.results!) {
@@ -172,7 +187,7 @@ class ApiManager{
       } else {
         return {
           "success": false,
-          "message":"Registration failed with status: ${response.statusCode}",
+          "message":"This email already in use",
         };
       }
     } catch (error) {

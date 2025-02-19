@@ -1,4 +1,4 @@
-import 'package:news/model/sources_response.dart';
+import 'package:news/model/poplar_movie_model.dart';
 
 class UpcomingResponse {
   Dates? dates;

@@ -7,27 +7,38 @@ import 'package:shared_preferences/shared_preferences.dart';
 class UserProvider extends ChangeNotifier {
   String? authToken;
   UserModel? userModel;
+  String? userEmail;
 
   UserProvider() {
     autoLogin();
   }
+
   Future<void> _saveUserData() async {
-    if (userModel == null) return;
+    if (userModel == null || userEmail == null) {
+      return;
+    }
     final prefs = await SharedPreferences.getInstance();
-    prefs.setString('userHistory', jsonEncode(userModel!.history));
-    prefs.setString('userFavorites', jsonEncode(userModel!.favorites));
+
+    await prefs.setString('username_$userEmail', jsonEncode(userModel!.name));
+    await prefs.setString('userHistory_$userEmail', jsonEncode(userModel!.history));
+    await prefs.setString('userFavorites_$userEmail', jsonEncode(userModel!.favorites));
+
   }
   Future<void> _loadUserData() async {
+    if (userEmail == null) return;
     final prefs = await SharedPreferences.getInstance();
-    final historyString = prefs.getString('userHistory');
-    final favoritesString = prefs.getString('userFavorites');
+    final savedUsername = prefs.getString('username_$userEmail');
+    final historyString = prefs.getString('userHistory_$userEmail');
+    final favoritesString = prefs.getString('userFavorites_$userEmail');
 
     if (userModel != null) {
+      userModel!.name = savedUsername ?? "Guest"; // Fallback to "Guest"
       userModel!.history =
       historyString != null ? List<int>.from(jsonDecode(historyString)) : [];
       userModel!.favorites =
       favoritesString != null ? List<int>.from(jsonDecode(favoritesString)) : [];
     }
+
     notifyListeners();
   }
 
@@ -42,22 +53,21 @@ class UserProvider extends ChangeNotifier {
       if (response.statusCode == 200) {
         Map<String, dynamic> responseBody = jsonDecode(response.body);
         authToken = responseBody['data'];
+        userEmail = email;
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setString('authToken', authToken!);
+        await prefs.setString('userEmail', userEmail!);
 
-        debugPrint('Login successful, Token: $authToken'); // Debugging
+        userModel = null;
 
         await initUser();
         notifyListeners();
 
         return true;
       } else {
-        debugPrint('Login failed: ${response.body}'); // Debugging
         return false;
       }
     } catch (error) {
-      debugPrint('Login error: $error'); // Debugging
-
       return false;
     }
   }
@@ -65,8 +75,9 @@ class UserProvider extends ChangeNotifier {
   Future<void> autoLogin() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     authToken = prefs.getString('authToken');
+    userEmail = prefs.getString('userEmail'); // تحميل الإيميل من التخزين
 
-    if (authToken != null) {
+    if (authToken != null && userEmail != null) {
       debugPrint("Auto-login: Token exists, fetching user...");
       try {
         await initUser();
@@ -94,11 +105,14 @@ class UserProvider extends ChangeNotifier {
       if (response.statusCode == 200) {
         Map<String, dynamic> responseBody = jsonDecode(response.body);
         if (responseBody.containsKey('data')) {
-          var userData = responseBody['data']; // Extract the data object
+          var userData = responseBody['data'];
           if (userData.containsKey('name')) {
             userModel = UserModel.fromJson(userData);
             debugPrint('User initialized: ${userModel?.toJson()}');
+            final prefs = await SharedPreferences.getInstance();
+            await prefs.setString('username_$userEmail', userModel!.name);
             await _loadUserData();
+            notifyListeners();
 
           } else {
             print('No name field in the profile data');
@@ -120,9 +134,11 @@ class UserProvider extends ChangeNotifier {
   Future<void> logout() async {
     authToken = null;
     userModel = null;
+    userEmail = null;
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.remove('authToken');
+    await prefs.remove('userEmail');
 
     notifyListeners();
     debugPrint("User logged out, token removed.");
@@ -133,7 +149,6 @@ class UserProvider extends ChangeNotifier {
       userModel!.history.add(movieId);
       _saveUserData(); // Save to storage
       notifyListeners();
-      print('تمت إضافة الفيلم إلى التاريخ: $movieId');
     }
   }
 
@@ -142,7 +157,6 @@ class UserProvider extends ChangeNotifier {
       userModel!.favorites.add(movieId);
       _saveUserData(); // Save to storage
       notifyListeners();
-      print('تمت إضافة الفيلم إلى المفضلة: $movieId');
     }
   }
 

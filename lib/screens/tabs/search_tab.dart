@@ -3,9 +3,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:news/api_manager.dart';
-import 'package:news/model/sources_response.dart';
-
 import '../../items/movie_item.dart';
+import '../../model/poplar_movie_model.dart';
 
 class SearchTab extends StatefulWidget {
   const SearchTab({super.key});
@@ -43,7 +42,7 @@ class _SearchTabState extends State<SearchTab> {
 
   Future<void> _searchMovies(String query) async {
     try {
-      SourcesResponse response = await ApiManager.getPopularByName(searchController.text);
+      PoplarMovieModel response = await ApiManager.getPopularByName(searchController.text);
       setState(() {
         moviesSearchList = response.results!;
         _isLoading = false;
@@ -93,7 +92,7 @@ class _SearchTabState extends State<SearchTab> {
                     borderSide: const BorderSide(color: Colors.white)),
             ),
           ),
-         FutureBuilder<SourcesResponse>(future: ApiManager.getPopularByName(searchController.text),
+         FutureBuilder<PoplarMovieModel>(future: ApiManager.getPopularByName(searchController.text),
              builder: (context,snapshot){
                if(snapshot.connectionState == ConnectionState.waiting){
                  return const Center(child: CircularProgressIndicator());
@@ -101,22 +100,15 @@ class _SearchTabState extends State<SearchTab> {
                if(snapshot.hasError){
                  return Center(child: Text("Something Went Wrong",style: Theme.of(context).textTheme.titleLarge,));
                }
-               var data = snapshot.data?.results??[];
+               var movies = snapshot.data?.results??[];
                return Expanded(
                  child: ListView.builder(itemBuilder: (context,index){
-                   return MovieItem(results: data[index],);
+                   return MovieItem(movieId:movies[index].id??0 ,voteAverage: movies[index].voteAverage??0,movieImage: movies[index].posterPath??"",);
+
                  },
-                 itemCount: data.length,),
+                 itemCount: movies.length,),
                );
              })
-         /* if(_isLoading)CircularProgressIndicator(),
-          Expanded(child: ListView.builder(
-              itemCount: moviesSearchList.length,
-              itemBuilder: (context,index){
-                final movie = moviesSearchList[index];
-
-                return Text(movie.name??"No title",style: Theme.of(context).textTheme.headlineSmall,);})
-          )*/
         ],
       ),),
     );
