@@ -1,12 +1,12 @@
 import 'dart:convert';
-
 import 'package:http/http.dart' as http;
+import 'package:news/model/similar_movies_model.dart';
+import 'package:news/model/upcoming_movies.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'model/browse_image_response.dart';
 import 'model/browse_list_response.dart';
-import 'model/image_response.dart';
 import 'model/movie_details_response.dart';
 import 'model/poplar_movie_model.dart';
-import 'model/upcoming_response.dart';
 import 'model/user_model.dart';
 
 class ApiManager{
@@ -30,13 +30,23 @@ class ApiManager{
     }
   }
 
-  static Future<UpcomingResponse> getupComing()async{
-    Uri url=Uri.parse("https://api.themoviedb.org/3/movie/upcoming?api_key=1af5751239f6c52b196a77e23dcf8416");
+  static Future<UpcomingMovies?> getupComing()async{
+    Uri url=Uri.parse("https://api.themoviedb.org/3/movie/upcoming?api_key=1af5751239f6c52b196a77e23dcf8416&language=en-US&page=1");
+    try {
+      final response = await http.get(url);
+      print("Upcoming Movies API Status: ${response.statusCode}");
+      print("Upcoming Movies API Response: ${response.body}");
 
-    http.Response response = await http.get(url);
-    var json =jsonDecode(response.body);
-    UpcomingResponse upcomingResponse=UpcomingResponse.fromJson(json);
-    return upcomingResponse;
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        return UpcomingMovies.fromJson(data);
+      } else {
+        throw Exception('Failed to load upcoming movies');
+      }
+    } catch (e) {
+      print('Error fetching movies: $e');
+      return null;
+    }
   }
 
   static Future<BrowseListResponse> getBrowseList()async{
@@ -63,15 +73,6 @@ class ApiManager{
     }
   }
 
-  static Future<ImageResponse> getMovieImages(int movieId) async {
-    final Uri url = Uri.parse("https://api.themoviedb.org/3/movie/$movieId/images?api_key=1af5751239f6c52b196a77e23dcf8416");
-
-    http.Response response = await http.get(url);
-    var json =jsonDecode(response.body);
-    ImageResponse imageResponse=ImageResponse.fromJson(json);
-    return imageResponse;
-  }
-
   static Future<MovieDetailsResponse> getDetails(int movieId) async {
     final Uri url = Uri.parse("https://api.themoviedb.org/3/movie/$movieId?api_key=2b0d978a962d720636b46566d80b8e37");
 
@@ -95,6 +96,22 @@ class ApiManager{
       return moviesList;
     } else {
       throw Exception("Failed to load movies");
+    }
+  }
+
+  static Future<SimilarMoviesModel> getSimilarMovies(int movieId) async {
+    Uri url = Uri.parse(
+        "https://api.themoviedb.org/3/movie/$movieId/similar?api_key=1af5751239f6c52b196a77e23dcf8416");
+
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        return SimilarMoviesModel.fromJson(jsonDecode(response.body));
+      } else {
+        throw Exception("Failed to load similar movies");
+      }
+    } catch (e) {
+      throw Exception("Error: $e");
     }
   }
 
@@ -198,6 +215,42 @@ class ApiManager{
     }
   }
 
+  static Future<bool> resetPassword(String oldPassword, String newPassword) async {
+    final Uri url = Uri.parse("https://route-movie-apis.vercel.app/auth/reset-password"); // Replace with actual API
+
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? authToken = prefs.getString('authToken');
+
+      if (authToken == null) {
+        print("❌ Error: No authentication token found.");
+        return false;
+      }
+
+      final response = await http.patch(
+        url,
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $authToken", // ✅ Include token
+        },
+        body: jsonEncode({
+          "oldPassword": oldPassword,
+          "newPassword": newPassword,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        print("✅ Password reset successful!");
+        return true;
+      } else {
+        print("❌ Failed to reset password: ${response.statusCode}, ${response.body}");
+        return false;
+      }
+    } catch (e) {
+      print("❌ Error resetting password: $e");
+      return false;
+    }
+  }
 
 }
 

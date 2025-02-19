@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:news/api_manager.dart';
 import 'package:news/items/prowse_item.dart';
 import 'package:news/model/browse_image_response.dart';
+import '../../items/movie_item.dart';
 import '../../model/browse_list_response.dart';
 
 class BrowseTab extends StatefulWidget {
@@ -109,9 +110,18 @@ class _BrowseTabState extends State<BrowseTab> {
                                       childAspectRatio: .7,
                                     ),
                                     itemBuilder: (context, index) {
-                                      return ProwseItem(
-                                          results:
-                                              snapshot.data!.results![index]);
+                                      var movies = snapshot.data?.results ?? [];
+
+                                      return SizedBox(
+                                        width: 120,
+                                        child: MovieItem(
+                                          movieId: movies[index].id ?? 0,
+                                          voteAverage:
+                                          movies[index].voteAverage ?? 0,
+                                          movieImage:
+                                          movies[index].posterPath ?? "",
+                                        ),
+                                      );
                                     },
                                     itemCount:
                                         snapshot.data?.results?.length ?? 0,

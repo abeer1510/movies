@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -61,19 +62,20 @@ class _MovieScreenshotsState extends State<MovieScreenshots> {
     if (hasError || screenshots.isEmpty) {
       return Center(child: Text("No images available for this movie.")); // 🚫 No images found
     }
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: screenshots.map((imageUrl) {
-          return Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: Image.network(imageUrl, height: 200),
-            ),
-          );
-        }).toList(),
-      ),
-    );
+    return SizedBox(
+      height: 200, 
+      child:ListView.separated(
+          scrollDirection: Axis.horizontal,
+          itemBuilder: (context,index){
+        return Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: CachedNetworkImage(imageUrl: screenshots[index], height: 200),
+          ),
+        );
+      }, separatorBuilder: (context,index)=>SizedBox(width: 6,), itemCount: screenshots.length)
+
+      );
   }
 }

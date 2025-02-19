@@ -7,6 +7,7 @@ import 'package:news/screens/edit_profile.dart';
 import 'package:news/screens/forget_password.dart';
 import 'package:news/screens/history_screen.dart';
 import 'package:news/screens/login_screen.dart';
+import 'package:news/screens/reset_password_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'cache_helper/cache_helper.dart';
@@ -63,6 +64,7 @@ class MyApp extends StatelessWidget {
         HomeScreen.routeName:(context)=>HomeScreen(),
         EditProfile.routeName:(context)=>EditProfile(),
         HistoryScreen.routName:(context)=>HistoryScreen(),
+        ResetPasswordScreen.routeName:(context)=>ResetPasswordScreen(),
 
 
       },

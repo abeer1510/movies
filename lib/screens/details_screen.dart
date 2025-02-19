@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:news/screens/screen_shots.dart';
+import 'package:news/screens/similar_movies.dart';
 import 'package:provider/provider.dart';
 
 import '../api_manager.dart';
@@ -32,18 +33,22 @@ class _DetailsScreenState extends State<DetailsScreen> {
   }
   Future<void> checkIfFavorite() async {
     var userProvider = Provider.of<UserProvider>(context, listen: false);
+    await userProvider.loadFavorites(); // 🔥 تحميل المفضلة من جديد
+
     bool exists = await userProvider.isFavorite(widget.movieId);
     setState(() {
       isFavorite = exists;
     });
+    debugPrint("🔍 Checking if favorite: $isFavorite");
   }
   Future<void> toggleFavorite(MovieDetailsResponse movie) async {
     var userProvider = Provider.of<UserProvider>(context, listen: false);
+    bool success;
 
     if (isFavorite) {
-      await userProvider.removeFromFavorites(widget.movieId);
+     success= await userProvider.removeFromFavorites(widget.movieId);
     } else {
-      await userProvider.addToFavorites(
+     success = await userProvider.addToFavorites(
         movieId: widget.movieId,
         name: movie.title ?? "No Title",
         rating: movie.voteAverage ?? 0.0,
@@ -51,9 +56,11 @@ class _DetailsScreenState extends State<DetailsScreen> {
         year: movie.releaseDate?.substring(0, 4) ?? "Unknown",
       );
     }
-    setState(() {
-      isFavorite = !isFavorite;
-    });
+    if(success){
+      setState(() {
+        isFavorite = !isFavorite;
+      });
+    }
   }
   @override
   Widget build(BuildContext context) {
@@ -100,6 +107,8 @@ class _DetailsScreenState extends State<DetailsScreen> {
                             child: ElevatedButton(
                               onPressed: () {
                                 userProvider.addToHistory(movieId);
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text("Movie added to history list")));
                               },
                               style: ElevatedButton.styleFrom(backgroundColor: Colors.red,shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12),
                               )),
@@ -123,7 +132,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                       : "No Date");*/
                             },
                             child:
-                            infoContainer(isFavorite==true?Icon(Icons.favorite,color: Theme.of(context).primaryColor,):Icon(Icons.favorite_border,color: Theme.of(context).primaryColor,), movie.voteCount,context),
+                            infoContainer(isFavorite?Icon(Icons.favorite,color: Theme.of(context).primaryColor,):Icon(Icons.favorite_border,color: Theme.of(context).primaryColor,), movie.voteCount,context),
                           ),
                           infoContainer(Icon(Icons.timer_outlined,color: Theme.of(context).primaryColor), movie.runtime,context),
                           infoContainer(Icon(Icons.star,color: Theme.of(context).primaryColor), movie.voteAverage,context),
@@ -133,6 +142,9 @@ class _DetailsScreenState extends State<DetailsScreen> {
                       sectionTitle("Screen Shots"),
                       MovieScreenshots(movieId: movieId),
                       sectionTitle("Similar"),
+                      SizedBox(
+                          height: 550,
+                          child: SimilarMovies(movieId: movieId)),
                       sectionTitle("Summary"),
                       Padding(
                         padding: const EdgeInsets.all(8.0),

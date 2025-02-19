@@ -1,8 +1,10 @@
 import 'dart:async';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:news/api_manager.dart';
 import 'package:news/items/movie_item.dart';
+import 'package:news/model/movie_details_response.dart';
 import 'package:provider/provider.dart';
 
 import '../model/poplar_movie_model.dart';
@@ -122,8 +124,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
                       } else if (snapshot.hasError || snapshot.data == null) {
                         return Center(child: Text("Failed to load favorites"));
                       } else {
-                        List<dynamic> favorites = snapshot.data!;
-                        return _buildGridView(snapshot.data!);
+                        List<int> favorites = snapshot.data!;
+                        return _buildGridView(favorites);
                       }
                     },
                   ),
@@ -150,8 +152,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
       itemCount: movieIds.length,
       itemBuilder: (context, index) {
         int movieId = movieIds[index];
-        return FutureBuilder<Results?>(
-          future: getMovieDetails(movieId), // Using the cached Future
+        return FutureBuilder<MovieDetailsResponse>(
+          future: ApiManager.getDetails(movieId), // Using the cached Future
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Center(child: CircularProgressIndicator());
@@ -172,8 +174,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
                       ),
                     );
                   },
-                  child: Image.network(
-                    "https://image.tmdb.org/t/p/w500${snapshot.data!.posterPath}" ?? "",
+                  child: CachedNetworkImage(imageUrl:
+                  snapshot.data!.posterPath != null
+                      ? "https://image.tmdb.org/t/p/w500${snapshot.data!.posterPath}"
+                      : "fallback_image_url",
                     fit: BoxFit.fill,
                     height: 300,
                     width: 230,
