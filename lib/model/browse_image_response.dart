@@ -1,13 +1,13 @@
-class prowseimageResponse {
+class BrowseImageResponse {
   int? page;
   List<Results2>? results;
   int? totalPages;
   int? totalResults;
 
-  prowseimageResponse(
+  BrowseImageResponse(
       {this.page, this.results, this.totalPages, this.totalResults});
 
-  prowseimageResponse.fromJson(Map<String, dynamic> json) {
+  BrowseImageResponse.fromJson(Map<String, dynamic> json) {
     page = json['page'];
     if (json['results'] != null) {
       results = <Results2>[];

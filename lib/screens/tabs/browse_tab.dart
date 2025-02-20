@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:news/api_manager.dart';
 import 'package:news/items/prowse_item.dart';
-import 'package:news/model/prowesimage_response.dart';
-import '../../model/prowselist_response.dart';
+import 'package:news/model/browse_image_response.dart';
+import '../../items/movie_item.dart';
+import '../../model/browse_list_response.dart';
 
 class BrowseTab extends StatefulWidget {
   BrowseTab({super.key});
@@ -20,8 +21,8 @@ class _BrowseTabState extends State<BrowseTab> {
   Widget build(BuildContext context) {
     return Scaffold(
         body: SafeArea(
-      child: FutureBuilder<prowselistResponse>(
-          future: ApiManager.getprowiselist(),
+      child: FutureBuilder<BrowseListResponse>(
+          future: ApiManager.getBrowseList(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Center(child: CircularProgressIndicator());
@@ -92,8 +93,8 @@ class _BrowseTabState extends State<BrowseTab> {
                     ),
                     isLoading
                         ? Center(child: CircularProgressIndicator())
-                        : FutureBuilder<prowseimageResponse>(
-                            future: ApiManager.getprowiseimage(
+                        : FutureBuilder<BrowseImageResponse>(
+                            future: ApiManager.getBrowseImage(
                                 "${data[selectedindex].id}" ?? ""),
                             builder: (context, snapshot) {
                               return Expanded(
@@ -109,9 +110,18 @@ class _BrowseTabState extends State<BrowseTab> {
                                       childAspectRatio: .7,
                                     ),
                                     itemBuilder: (context, index) {
-                                      return ProwseItem(
-                                          results:
-                                              snapshot.data!.results![index]);
+                                      var movies = snapshot.data?.results ?? [];
+
+                                      return SizedBox(
+                                        width: 120,
+                                        child: MovieItem(
+                                          movieId: movies[index].id ?? 0,
+                                          voteAverage:
+                                          movies[index].voteAverage ?? 0,
+                                          movieImage:
+                                          movies[index].posterPath ?? "",
+                                        ),
+                                      );
                                     },
                                     itemCount:
                                         snapshot.data?.results?.length ?? 0,
@@ -133,7 +143,7 @@ class _BrowseTabState extends State<BrowseTab> {
     });
 
     try {
-      var response = await ApiManager.getprowiseimage(genreId.toString());
+      var response = await ApiManager.getBrowseImage(genreId.toString());
       setState(() {
         cachedData[genreId] = response.results ?? [];
         isLoading = false;

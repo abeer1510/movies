@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:news/screens/edit_profile.dart';
+import 'package:news/screens/history_screen.dart';
 import 'package:news/screens/login_screen.dart';
 import 'package:provider/provider.dart';
 
@@ -11,133 +13,111 @@ class ProfileTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var userProvider = Provider.of<UserProvider>(context);
+    var userProvider = Provider.of<UserProvider>(context,listen:true);
 
-    return Scaffold(
-      backgroundColor: Color(0xFF2B2A2B) ,
-      body:Padding(
-        padding: const EdgeInsets.only(top: 50.0),
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    children: [
-                      Image.asset("assets/images/gamer1.png"),
-                      SizedBox(height: 16,),
-                      Text("${userProvider.userModel?.name}",style: Theme.of(context).textTheme.headlineSmall,),
-                    ],
-                  ),
-                  Column(
-                    children: [
-                      Text("12",style: Theme.of(context).textTheme.headlineLarge,),
-                      SizedBox(height: 16,),
-                      Text("Wish List",style: Theme.of(context).textTheme.headlineMedium,),
-                    ],
-                  ),
-                  Column(
-                    children: [
-                      Text("10",style: Theme.of(context).textTheme.headlineLarge,),
-                      SizedBox(height: 16,),
-                      Text("History",style: Theme.of(context).textTheme.headlineMedium,),
-                    ],
-                  )
-                ],
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: Color(0xFF2B2A2B) ,
+        
+        body:SingleChildScrollView(
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24,vertical: 12),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      children: [
+                        Image.asset("assets/images/gamer${userProvider.userModel?.avaterId}.png"),
+                        SizedBox(height: 16,),
+                        Text("${userProvider.userModel?.name}",style: Theme.of(context).textTheme.headlineSmall,),
+                      ],
+                    ),
+                    Column(
+                      children: [
+                        Text("${userProvider.favorites.length}",style: Theme.of(context).textTheme.headlineLarge,),
+                        SizedBox(height: 16,),
+                        Text("Wish List",style: Theme.of(context).textTheme.headlineMedium,),
+                      ],
+                    ),
+                    Column(
+                      children: [
+                        Text("${userProvider.history.length}",style: Theme.of(context).textTheme.headlineLarge,),
+                        SizedBox(height: 16,),
+                        Text("History",style: Theme.of(context).textTheme.headlineMedium,),
+                      ],
+                    )
+                  ],
+                ),
               ),
-            ),
-            SizedBox(height: 23,),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: ElevatedButton(
+              SizedBox(height: 12,),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.pushNamed(context, EditProfile.routeName);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            padding: EdgeInsets.symmetric(vertical: 8),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            backgroundColor: Theme.of(context).primaryColor,
+                          ),
+                          child: Text('Edit Profile',
+                              style: GoogleFonts.roboto(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w400,
+                                color: Color(0xff121312),
+                              ))),
+                    ),
+                    SizedBox(width: 10,),
+                    ElevatedButton(
                         onPressed: () {
-
-                        },
+                          userProvider.logout();
+                          Navigator.pushReplacementNamed(context, LoginScreen.routeName);
+                          },
                         style: ElevatedButton.styleFrom(
                           padding: EdgeInsets.symmetric(vertical: 8),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          backgroundColor: Theme.of(context).primaryColor,
+                          backgroundColor: Color(0xFFE82626),
                         ),
-                        child: Text('Edit Profile',
-                            style: GoogleFonts.roboto(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w400,
-                              color: Color(0xff121312),
-                            ))),
-                  ),
-                  SizedBox(width: 10,),
-                  ElevatedButton(
-                      onPressed: () {
-                        FirebaseManager.logOut().then((_){
-    Navigator.pushNamedAndRemoveUntil(context, LoginScreen.routeName, (route) => false,);
-                      });},
-                      style: ElevatedButton.styleFrom(
-                        padding: EdgeInsets.symmetric(vertical: 8),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        backgroundColor: Color(0xFFE82626),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 25),
-                        child: Row(
-                          children: [
-                            Text('Exit',
-                                style: GoogleFonts.roboto(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w400,
-                                  color: Colors.white,
-                                )),
-                            SizedBox(width: 4,),
-                            Icon(Icons.exit_to_app,color: Colors.white,)
-                          ],
-                        ),
-                      ))
-
-                ],
-              ),
-            ),
-            SizedBox(height: 24,),
-            DefaultTabController(length: 2,
-                child: TabBar(
-                  isScrollable: false,
-                    dividerColor: Colors.transparent,
-                    indicatorColor: Theme.of(context).primaryColor,
-                    labelPadding: EdgeInsets.zero,
-                    tabs: [
-                      Column(
-                  children: [
-                    Icon(Icons.list,color: Theme.of(context).primaryColor,),
-                    SizedBox(height: 4,),
-                    Text("Watch List",style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w400),)
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 25),
+                          child: Row(
+                            children: [
+                              Text('Exit',
+                                  style: GoogleFonts.roboto(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w400,
+                                    color: Colors.white,
+                                  )),
+                              SizedBox(width: 4,),
+                              Icon(Icons.exit_to_app,color: Colors.white,)
+                            ],
+                          ),
+                        ))
+      
                   ],
                 ),
-                      Column(
-                  children: [
-                    Icon(Icons.folder,color: Theme.of(context).primaryColor,),
-                    SizedBox(height: 4,),
-                    Text("History",style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w400),)
-                  ],
-                )
-                ])
-            ),
-
-            Expanded(child: Container(
-                color: Color(0xFF121312),
-                width: double.infinity,
-                child: Image.asset("assets/images/popcorn.png")))
-
-          ],
-        ),
-      )
+              ),
+              SizedBox(height: 24,),
+              Container(
+                  height: MediaQuery.of(context).size.height * 0.6,
+      
+                  child: HistoryScreen()),
+      
+            ],
+          ),
+        )
+      ),
     );
   }
 }

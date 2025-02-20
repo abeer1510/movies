@@ -73,11 +73,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     validation: (value){
                       if (value == null || value.isEmpty) {
                         return "Password is required";
-                      }String pattern =
-                          r'^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[?!.@#$%^&*()_+])[A-Za-z\d?!.@#$%^&*()_+]{8,}$';
-                      RegExp regExp = RegExp(pattern);
-                      if (!regExp.hasMatch(value)) {
-                        return 'Password must be at least 8 characters long, with 1 uppercase, 1 lowercase, 1 number, and 1 special character';
                       }
                       return null;
                     },
@@ -111,44 +106,30 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: Container(
                     width: double.infinity,
                     child: ElevatedButton(
-                        onPressed: () {
+                        onPressed: () async{
                           if(formKey.currentState!.validate()){
-                            FirebaseManager.logIn(
-                                emailController.text, passwordController.text, () async{
-                              await userProvider.initUser();
-                              Navigator.pop(context);
-                              Navigator.pushNamedAndRemoveUntil(
+                            bool isLoggedIn = await Provider.of<UserProvider>(context, listen: false).
+                            login(emailController.text, passwordController.text);
+                            if (isLoggedIn) {
+                              // Successfully logged in, navigate to the Home page
+                              Navigator.pushReplacement(
                                 context,
-                                HomeScreen.routeName,
-                                    (route) => false,
+                                MaterialPageRoute(builder: (context) => HomeScreen()),
                               );
-                            }, () {
-                              showDialog(
-                                context: context,
-                                builder: (context) => const AlertDialog(
-                                  backgroundColor: Colors.transparent,
-                                  title: Center(child: CircularProgressIndicator()),
-                                ),
-                              );
-                            }, (message) {
-                              Navigator.pop(context);
-                              showDialog(
-                                context: context,
-                                builder: (context) => AlertDialog(
-                                  title: const Text("Something went wrong"),
-                                  content: Text(message),
-                                  actions: [
-                                    ElevatedButton(
-                                        onPressed: () {
-                                          Navigator.pop(context);
-                                        },
-                                        child: const Text("Ok"))
-                                  ],
-                                ),
-                              );
-                            });
-
-                          }
+                            }
+                            else{
+                              showDialog(context: context, builder: (context)=>AlertDialog(
+                                title: Text("Login Failed"),
+                                content:  Text("Invalid credentials. Please try again."),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.of(context).pop(),
+                                    child: Text("OK"),
+                                  ),
+                                ],
+                              ));
+                            }
+                          };
                         },
 
                         style: ElevatedButton.styleFrom(
@@ -160,9 +141,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         child: InkWell(
                           onTap: (){
-                            Navigator.pushNamed(context, HomeScreen.routeName);
-                            print("${userProvider.userModel?.name}");
-
+                            Navigator.pushReplacementNamed(context, HomeScreen.routeName);
                           },
                           child: Text('login'.tr(),
                               style: GoogleFonts.inter(
@@ -228,7 +207,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 ElevatedButton(
                     onPressed: () {
-                      FirebaseManager.signInWithGoogle;
                     },
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 14),

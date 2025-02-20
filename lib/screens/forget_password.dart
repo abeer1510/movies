@@ -66,9 +66,6 @@ class ForgetPassword extends StatelessWidget {
                     child: ElevatedButton(
                         onPressed: () {
                           if(formKey.currentState!.validate()){
-                            return
-                            FirebaseManager.forgetPassword(emailController.text);
-
                           }
                         },
                         style: ElevatedButton.styleFrom(

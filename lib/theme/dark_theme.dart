@@ -52,7 +52,7 @@ class DarkTheme extends BaseTheme{
               fontSize: 28,fontWeight: FontWeight.w700,color: Colors.white
           ),
         headlineSmall: GoogleFonts.roboto(
-            fontSize: 20,fontWeight: FontWeight.w700,color: Colors.white
+            fontSize: 20,fontWeight: FontWeight.w400,color: Colors.white
         ),
       )
   );

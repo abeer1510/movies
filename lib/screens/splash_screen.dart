@@ -1,5 +1,11 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:news/screens/login_screen.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../cache_helper/cache_helper.dart';
+import '../provider/auth_provider.dart';
+import 'home_screen.dart';
 import 'onbording_screen.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -12,14 +18,23 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    // Start a timer for 3 seconds
-    Timer(Duration(seconds: 3), () {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => OnBoardingScreen()),
-      );
-    });
+    _checkUserStatus();
   }
+  Future<void> _checkUserStatus() async {
 
+    bool onboardingCompleted = CacheHelper.getEligibility() ?? false;
+    var userProvider = Provider.of<UserProvider>(context, listen: false);
+
+    await Future.delayed(Duration(seconds: 2));
+
+    if (!onboardingCompleted) {
+      Navigator.pushReplacementNamed(context, OnBoardingScreen.routeName);
+    } else if (userProvider.isLoggedIn) {
+      Navigator.pushReplacementNamed(context, HomeScreen.routeName);
+    } else {
+      Navigator.pushReplacementNamed(context, LoginScreen.routeName);
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(

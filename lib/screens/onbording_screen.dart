@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:news/screens/login_screen.dart';
 
+import '../cache_helper/cache_helper.dart';
+
 class OnBoardingScreen extends StatefulWidget {
   static const String routeName ='OnBoardingScreen';
   @override
@@ -11,6 +13,10 @@ class _OnboardingScreenState extends State<OnBoardingScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
 
+  void _goToLogin(BuildContext context) async {
+    await CacheHelper.saveEligibility(); // Ensure the flag is saved
+    Navigator.pushReplacementNamed(context, LoginScreen.routeName); // Replace the screen
+  }
   void _nextPage() {
     if (_currentPage >= 0) {
       _pageController.nextPage(
@@ -24,12 +30,7 @@ class _OnboardingScreenState extends State<OnBoardingScreen> {
           duration: Duration(milliseconds: 300), curve: Curves.easeOut);
     }
   }
-  void _goToLogin(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => LoginScreen()),
-    );
-  }
+
 
   @override
   Widget build(BuildContext context) {

@@ -1,26 +1,46 @@
 class UserModel {
+  String name;
+  String email;
+  String password;
+  String confirmPassword;
+  String phone;
+  int avaterId;
+  List<int> history;
+  List<int> favorites;
 
-  String? id;
-  String? name;
-  String? email;
-  int? createAt;
+  UserModel({
+    required this.name,
+    required this.email,
+    required this.password,
+    required this.confirmPassword,
+    required this.phone,
+    required this.avaterId,
+    this.history = const [],
+    this.favorites = const [],
+  });
 
-  UserModel({required this.id,required this.name,required this.email,required this.createAt});
-
-  UserModel.fromJson(Map<String,dynamic> json) : this(
-    id: json["id"],
-    name: json["name"],
-    email: json["email"],
-    createAt: json["createAt"],
-  );
-
-  Map<String,dynamic> toJson(){
+  Map<String, dynamic> toJson() {
     return {
-      "id": id,
       "name": name,
       "email": email,
-      "createAt": createAt,
+      "password": password,
+      "confirmPassword": confirmPassword,
+      "phone": phone,
+      "avaterId": avaterId,
+      "history": history,
+      "favorites": favorites,
     };
-}
-
+  }
+  factory UserModel.fromJson(Map<String, dynamic> json) {
+    return UserModel(
+      name: json['name'] ?? '',
+      email: json['email'] ?? '',
+      password: json['password'] ?? '',
+      confirmPassword: json['confirmPassword'] ?? '',
+      phone: json['phone'] ?? '',
+      avaterId: json['avaterId'] ?? 0,
+      history: List<int>.from(json['history'] ?? []),
+      favorites: List<int>.from(json['favorites'] ?? []),
+    );
+  }
 }

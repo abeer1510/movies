@@ -1,9 +1,7 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:news/model/prowesimage_response.dart';
-import 'package:news/model/sources_response.dart';
-import 'package:news/model/upcoming_response.dart';
+import 'package:news/model/browse_image_response.dart';
 import 'package:news/screens/details_screen.dart';
 
 class ProwseItem extends StatelessWidget {
