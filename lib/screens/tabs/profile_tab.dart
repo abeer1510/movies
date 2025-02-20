@@ -13,7 +13,7 @@ class ProfileTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var userProvider = Provider.of<UserProvider>(context);
+    var userProvider = Provider.of<UserProvider>(context,listen:true);
 
     return SafeArea(
       child: Scaffold(
@@ -36,7 +36,7 @@ class ProfileTab extends StatelessWidget {
                     ),
                     Column(
                       children: [
-                        Text("${userProvider.favoriteMoviesCount}",style: Theme.of(context).textTheme.headlineLarge,),
+                        Text("${userProvider.favorites.length}",style: Theme.of(context).textTheme.headlineLarge,),
                         SizedBox(height: 16,),
                         Text("Wish List",style: Theme.of(context).textTheme.headlineMedium,),
                       ],

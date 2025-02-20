@@ -51,7 +51,7 @@ class SimilarMovies extends StatelessWidget {
               child: CachedNetworkImage(imageUrl:
               movie.posterPath != null
                   ? "https://image.tmdb.org/t/p/w500${movie.posterPath}"
-                  : "fallback_image_url",
+                  : "",
                 fit: BoxFit.fill,
                 height: 300,
                 width: 230,

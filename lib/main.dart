@@ -28,7 +28,9 @@ void main()async {
   );
   await FirebaseFirestore.instance.enableNetwork();
 
-  runApp(  ChangeNotifierProvider(
+  runApp(
+
+      ChangeNotifierProvider(
     create: (context)=> UserProvider(),
     child: EasyLocalization(
           supportedLocales: [Locale('en'), Locale('ar')],

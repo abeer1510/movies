@@ -33,10 +33,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
   @override
   void initState() {
     super.initState();
-    _favoritesFuture = getAllFavoritesIds();
   }
 
-  Future<List<int>> getAllFavoritesIds() async {
+ /* Future<List<int>> getAllFavoritesIds() async {
     var userProvider = Provider.of<UserProvider>(context, listen: false);
 
     try {
@@ -67,7 +66,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
       debugPrint("❌ Error fetching favorites: $e");
       return [];
     }
-  }
+  }*/
 
 
   @override
@@ -116,19 +115,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
             Expanded(
               child: TabBarView(
                 children: [
-                  FutureBuilder<List<int>>(
-                    future: _favoritesFuture,
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return Center(child: CircularProgressIndicator());
-                      } else if (snapshot.hasError || snapshot.data == null) {
-                        return Center(child: Text("Failed to load favorites"));
-                      } else {
-                        List<int> favorites = snapshot.data!;
-                        return _buildGridView(favorites);
-                      }
-                    },
-                  ),
+                  _buildGridView(userProvider.favorites),
                   _buildGridView(userProvider.history),
 
                 ],

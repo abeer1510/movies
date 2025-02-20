@@ -9,66 +9,29 @@ class UserProvider extends ChangeNotifier {
   String? authToken;
   UserModel? userModel;
   String? userEmail;
-  List<int> _favorites = []; // ✅ إضافة متغير داخلي قابل للتعديل
 
-  List<int> get favorites => _favorites;
   UserProvider() {
     autoLogin();
   }
 
-  Future<void> _saveUserData() async {
-    if (userModel == null || userEmail == null) {
-      return;
-    }
-    final prefs = await SharedPreferences.getInstance();
-
-    await prefs.setString('username_$userEmail', jsonEncode(userModel!.name));
-    await prefs.setString(
-        'userHistory_$userEmail', jsonEncode(userModel!.history));
-    await prefs.setString(
-        'userFavorites_$userEmail', jsonEncode(userModel!.favorites));
-  }
-
-  Future<void> _loadUserData() async {
-    if (userEmail == null) return;
-    final prefs = await SharedPreferences.getInstance();
-    final savedUsername = prefs.getString('username_$userEmail');
-    final historyString = prefs.getString('userHistory_$userEmail');
-    final favoritesString = prefs.getString('userFavorites_$userEmail');
-
-    if (userModel != null) {
-      userModel!.name = savedUsername ?? "Guest"; // Fallback to "Guest"
-      userModel!.history =
-      historyString != null ? List<int>.from(jsonDecode(historyString)) : [];
-      userModel!.favorites =
-      favoritesString != null ? List<int>.from(jsonDecode(favoritesString)) : [
-      ];
-    }
-
-    notifyListeners();
-  }
-
   Future<bool> login(String email, String password) async {
     Uri url = Uri.parse("https://route-movie-apis.vercel.app/auth/login");
-
     try {
       final response = await http.post(url,
           headers: {"Content-Type": "application/json"},
           body: jsonEncode({"email": email, "password": password}));
-
       if (response.statusCode == 200) {
         Map<String, dynamic> responseBody = jsonDecode(response.body);
         authToken = responseBody['data'];
         userEmail = email;
+        print(authToken);
+        print(userEmail);
+
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setString('authToken', authToken!);
         await prefs.setString('userEmail', userEmail!);
-
-        userModel = null;
-
         await initUser();
         notifyListeners();
-
         return true;
       } else {
         return false;
@@ -82,11 +45,13 @@ class UserProvider extends ChangeNotifier {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     authToken = prefs.getString('authToken');
     userEmail = prefs.getString('userEmail'); // تحميل الإيميل من التخزين
+    print("🔍 AutoLogin -> Token: $authToken, Email: $userEmail");
 
     if (authToken != null && userEmail != null) {
       debugPrint("Auto-login: Token exists, fetching user...");
       try {
         await initUser();
+
       } catch (e) {
         debugPrint("Auto-login failed: $e");
         logout();
@@ -100,24 +65,27 @@ class UserProvider extends ChangeNotifier {
 
   Future<void> initUser() async {
     if (authToken == null) {
-      debugPrint('Token is null');
+      print('Token is null');
       return;
     }
     Uri url = Uri.parse("https://route-movie-apis.vercel.app/profile");
     try {
+      print('📤 Fetching user profile...');
+
       final response =
       await http.get(url, headers: {"Authorization": "Bearer $authToken"});
-
+      print('📥 Response Code: ${response.statusCode}');
+      print('📥 Response Body: ${response.body}');
       if (response.statusCode == 200) {
         Map<String, dynamic> responseBody = jsonDecode(response.body);
         if (responseBody.containsKey('data')) {
           var userData = responseBody['data'];
           if (userData.containsKey('name')) {
             userModel = UserModel.fromJson(userData);
-            debugPrint('User initialized: ${userModel?.toJson()}');
+
+            print('User initialized: ${userModel?.toJson()}');
             final prefs = await SharedPreferences.getInstance();
             await prefs.setString('username_$userEmail', userModel!.name);
-            await _loadUserData();
             notifyListeners();
           } else {
             print('No name field in the profile data');
@@ -125,7 +93,6 @@ class UserProvider extends ChangeNotifier {
         } else {
           print('No data field in the profile response');
         }
-        notifyListeners();
       } else {
         debugPrint("Error: ${response.statusCode}, ${response.body}");
         logout();
@@ -149,30 +116,36 @@ class UserProvider extends ChangeNotifier {
     debugPrint("User logged out, token removed.");
   }
 
+  String get userName {
+    debugPrint("📢 Getting userName: ${userModel?.name}");
+    return userModel?.name ?? "No Name"; // Fallback
+  }
+
   void addToHistory(int movieId) {
     if (userModel != null && !userModel!.history.contains(movieId)) {
       userModel!.history.add(movieId);
-      _saveUserData(); // Save to storage
       notifyListeners();
     }
   }
 
-  /* void addToFavorites(int movieId) {
-    if (userModel != null && !userModel!.favorites.contains(movieId)) {
-      userModel!.favorites.add(movieId);
-      _saveUserData(); // Save to storage
-      notifyListeners();
-    }
-  }*/
+   void addToFavorites(int movieId) {
+     if (favorites.contains(movieId)) {
+       favorites.remove(movieId); // Remove if it's already in the list
+     } else {
+       favorites.add(movieId); // Add if it's not in the list
+     }
+     print(favorites); // Debugging: See if favorites list updates correctly
+     notifyListeners();
+   }
 
-  String get userName =>
-      userModel?.name ?? "No Name"; // Ensure it never returns null
+
+  bool isFavorite(int movieId) {
+    return favorites.contains(movieId);
+  }
 
   List<int> get history => userModel?.history ?? [];
 
-  /*List<int> get favorites => userModel?.favorites ?? [];*/
-  int get favoriteMoviesCount => favorites.length;
-
+  List<int> get favorites => userModel?.favorites ?? [];
 
   Future<bool> updateProfile(
       {required String name, required int avaterId, required String phone,}) async {
@@ -203,7 +176,6 @@ class UserProvider extends ChangeNotifier {
             userModel!.name = name;
             userModel!.phone = phone;
             userModel!.avaterId = avaterId;
-            await _saveUserData();
           }
 
           notifyListeners();
@@ -258,217 +230,4 @@ class UserProvider extends ChangeNotifier {
     }
   }
 
-  /* Future<bool> addToFavorites({ required int movieId,
-    required String name,
-    required double rating,
-    required String imageURL,
-    required String year,}) async {
-
-    if (authToken == null) {
-      debugPrint("Error: No authentication token found.");
-      return false;
-    }
-
-    Uri url = Uri.parse("https://route-movie-apis.vercel.app/favorites/add");
-
-    try {
-      debugPrint("Sending request to add movie to favorites: $url");
-
-      final response = await http.post(
-        url,
-        headers: {
-          "Authorization": "Bearer $authToken",
-          "Content-Type": "application/json",
-        },
-        body: jsonEncode({
-          "movieId": movieId,
-          "name": name,
-          "rating": rating,
-          "imageURL": imageURL,
-          "year": year,        }),
-      );
-
-      debugPrint("📥 Response Code: ${response.statusCode}");
-      debugPrint("📥 Response Body: ${response.body}");
-
-      if (response.statusCode == 200) {
-        debugPrint("✅ Movie added to favorites successfully!");
-
-        if (userModel != null && !userModel!.favorites.contains(movieId)) {
-          userModel!.favorites.add(movieId);
-          await _saveUserData();
-        }
-
-        notifyListeners();
-        return true;
-      } else {
-        debugPrint("❌ Failed to add movie to favorites: ${response.statusCode}, ${response.body}");
-        return false;
-      }
-    } catch (error) {
-      debugPrint("❌ Error adding movie to favorites: $error");
-      return false;
-    }
-  }*/
-  Future<bool> isFavorite(int movieId) async {
-    try {
-      final response = await http.get(
-        Uri.parse(
-            "https://route-movie-apis.vercel.app/favorites/is-favorite/$movieId"),
-      );
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        return data["isFavorite"] ==
-            true; // ✅ API returns true if the movie is a favorite
-      }
-    } catch (e) {
-      print("❌ Error checking favorite status: $e");
-    }
-    return false;
-  }
-
-  Future<bool> addToFavorites({
-    required int movieId,
-    required String name,
-    required double rating,
-    required String imageURL,
-    required String year,
-  }) async {
-    try {
-      if (authToken == null) {
-        debugPrint("❌ Error: No authentication token found.");
-        return false;
-      }
-      if (favorites.contains(movieId)) {
-        debugPrint("⚠️ Movie already in favorites: $movieId");
-        return false; // Return early to avoid unnecessary API call
-      }
-
-
-      debugPrint("📤 Adding movie: ID = $movieId, Name = $name, Rating = $rating");
-
-      if (userModel == null) return false; // Ensure userModel is not null
-
-      final response = await http.post(
-        Uri.parse("https://route-movie-apis.vercel.app/favorites/add"),
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer $authToken", // ✅ Token added automatically
-        },
-        body: jsonEncode({
-          "movieId": movieId,
-          "name": name,
-          "rating": rating,
-          "imageURL": imageURL,
-          "year": year,
-        }),
-      );
-
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        debugPrint("✅ Movie added successfully!");
-        _favorites.add(movieId); // Update local list
-        notifyListeners();
-
-        return true;
-      } else {
-        debugPrint("❌ Failed to add movie: ${response.statusCode}, ${response.body}");
-        return false; // ❌ Return false on failure
-      }
-    } catch (e) {
-      debugPrint("❌ Error adding movie to favorites: $e");
-      return false; // ❌ Return false in case of exception
-    }
-  }
-
-  Future<List<dynamic>> getAllFavorites() async {
-    if (authToken == null) return [];
-
-    Uri url = Uri.parse("https://route-movie-apis.vercel.app/favorites/all");
-
-    try {
-      final response = await http.get(
-        url,
-        headers: {"Authorization": "Bearer $authToken"},
-      );
-
-      if (response.statusCode == 200) {
-        Map<String, dynamic> responseBody = jsonDecode(response.body);
-        if (responseBody.containsKey('data') && responseBody['data'] is List) {
-          return responseBody['data'];
-        } else {
-          debugPrint("❌ Error: Unexpected response format.");
-          return [];
-        }
-      } else {
-        debugPrint(
-            "❌ Failed to fetch favorites: ${response.statusCode}, ${response
-                .body}");
-        return [];
-      }
-    } catch (error) {
-      debugPrint("❌ Error fetching favorites: $error");
-      return [];
-    }
-  }
-
-  Future<void> loadFavorites() async {
-    try {
-      List<dynamic> fetchedFavorites = await getAllFavorites();
-
-      _favorites = fetchedFavorites.map<int>((movie) {
-        if (movie.containsKey("movieId")) {
-          var movieId = movie["movieId"];
-          if (movieId is int) {
-            return movieId; // ✅ Already an int, return as is
-          } else if (movieId is String) {
-            try {
-              return int.parse(movieId); // ✅ Convert safely
-            } catch (e) {
-              debugPrint("⚠️ Invalid movie ID format: $movieId");
-            }
-          }
-        }
-        debugPrint("⚠️ Invalid movie format: $movie");
-        return -1; // Return -1 as a default invalid value
-      }).where((id) => id != -1).toList(); // Filter out invalid IDs
-
-      notifyListeners();
-      debugPrint("✅ Favorites loaded: $_favorites");
-    } catch (e) {
-      debugPrint("❌ Error loading favorites: $e");
-    }
-  }
-
-  Future<bool> removeFromFavorites(int movieId) async {
-    try {
-      if (authToken == null) {
-        debugPrint("❌ No authentication token found.");
-        return false;
-      }
-
-      debugPrint("📤 Removing movie ID: $movieId from favorites...");
-
-      final response = await http.delete(
-        Uri.parse("https://route-movie-apis.vercel.app/favorites/remove/$movieId"),
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer $authToken",
-        },
-      );
-
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        debugPrint("✅ Movie removed successfully!");
-        favorites.remove(movieId);
-        notifyListeners(); // تحديث الواجهة
-        return true;
-      } else {
-        debugPrint("❌ Failed to remove movie: ${response.statusCode}, ${response.body}");
-        return false;
-      }
-    } catch (e) {
-      debugPrint("❌ Error removing movie from favorites: $e");
-      return false;
-    }
-  }
 }
