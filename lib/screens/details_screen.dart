@@ -37,19 +37,19 @@ class _DetailsScreenState extends State<DetailsScreen> {
 
     return Scaffold(
         appBar: AppBar(),
-        body: FutureBuilder<MovieDetailsResponse>(
-            future: movieDetailsFuture,
-            builder: (context,snapshot){
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
-              } else if (snapshot.hasError) {
-                return Center(child: Text("Error: ${snapshot.error}"));
-              } else if (!snapshot.hasData) {
-                return const Center(child: Text("No movie details available"));
-              }
-              var movie=snapshot.data!;
-              return       SingleChildScrollView(
-                child: Padding(
+        body: SingleChildScrollView(
+          child: FutureBuilder<MovieDetailsResponse>(
+              future: movieDetailsFuture,
+              builder: (context,snapshot){
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text("Error: ${snapshot.error}"));
+                } else if (!snapshot.hasData) {
+                  return const Center(child: Text("No movie details available"));
+                }
+                var movie=snapshot.data!;
+                return       Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Column(
                     children: [
@@ -57,9 +57,9 @@ class _DetailsScreenState extends State<DetailsScreen> {
                         alignment: Alignment.center,
                         children: [
                           movie.posterPath != null
-                              ? Image.network("https://image.tmdb.org/t/p/w500${movie.posterPath}",height: 300,width: double.infinity)
+                              ? Image.network("https://image.tmdb.org/t/p/w500${movie.posterPath}",height: 300,width: double.infinity,fit:BoxFit.fill)
                               : const Placeholder(fallbackHeight: 200, fallbackWidth: double.infinity),
-                          Icon(Icons.play_circle_outline,color:Theme.of(context).primaryColor,size: 50,),
+                          Image(image:AssetImage("assets/images/video.png")),
                         ],
                       ),
                       Text(movie.title ?? "No Title", style: Theme.of(context).textTheme.headlineMedium),
@@ -90,11 +90,11 @@ class _DetailsScreenState extends State<DetailsScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
                           InkWell(
-
+                
                           onTap: (){
                               userProvider.addToFavorites(movieId);
                             },
-
+                
                             child:
                             infoContainer(userProvider.isFavorite(movieId) ?Icon(Icons.favorite,color: Theme.of(context).primaryColor,):Icon(Icons.favorite_border,color: Theme.of(context).primaryColor,), movie.voteCount,context),
                           ),
@@ -115,12 +115,13 @@ class _DetailsScreenState extends State<DetailsScreen> {
                         child: Text(movie.overview ?? "No Overview",
                             style: Theme.of(context).textTheme.titleSmall),
                       ),
+                      
                     ],
                   ),
-                ),
-              );
-
-            })
+                );
+          
+              }),
+        )
 
     );
   }

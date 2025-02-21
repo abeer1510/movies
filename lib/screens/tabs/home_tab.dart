@@ -127,7 +127,7 @@ class HomeTab extends StatelessWidget {
                                       final movie = movies[index];
                                       print("Movie: ${movie.title}, ID: ${movie.id}"); // ✅ Debug each movie
                                       return SizedBox(
-                                        width: 120,
+                                        width: 160,
                                         child: MovieItem(
                                           movieId: movie.id ?? 0,
                                           voteAverage:

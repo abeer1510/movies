@@ -13,7 +13,6 @@ import '../api_manager.dart';
 import '../firebase/firebase_manager.dart';
 import '../model/user_model.dart';
 import '../provider/auth_provider.dart';
-import 'home_screen.dart';
 import 'login_screen.dart';
 
 class RegisterScreen extends StatefulWidget {

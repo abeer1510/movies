@@ -10,9 +10,12 @@ class CacheHelper{
 
  static Future<void> saveEligibility()async{
     await prefs.setBool("onBoarding", true);
+
  }
 
  static bool? getEligibility(){
    return prefs.getBool("onBoarding");
+
  }
+
 }
